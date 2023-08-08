@@ -7,6 +7,12 @@ module.exports = {
 
   theme: {
     extend: {},
+    colors: {
+      main: "#14AE5C",
+      mainDark: "#076342",
+      transparentGreen: "#07634233",
+      secondary: "#FFBE48",
+    },
   },
   plugins: [require("flowbite/plugin"), require("tailwind-scrollbar-hide")],
 };

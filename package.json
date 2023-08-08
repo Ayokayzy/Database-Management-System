@@ -1,5 +1,5 @@
 {
-  "name": "hrcore",
+  "name": "traffic-age",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,6 +13,7 @@
     "axios": "^1.4.0",
     "flowbite": "^1.7.0",
     "flowbite-react": "^0.4.11",
+    "framer-motion": "^10.15.0",
     "jquery": "^3.7.0",
     "moment": "^2.29.4",
     "react": "^18.2.0",
