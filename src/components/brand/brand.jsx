@@ -5,13 +5,13 @@ const Brand = ({ height, white }) => {
     <Link to={"/"}>
       {white ? (
         <img
-          src={require("../../assets/brand.png")}
+          src={require("../../assets/logos/logo-white.png")}
           alt=""
           className={`${height || "h-10"}`}
         />
       ) : (
         <img
-          src={require("../../assets/brand.png")}
+          src={require("../../assets/logos/logo-green.png")}
           alt=""
           className={`${height || "h-10"}`}
         />

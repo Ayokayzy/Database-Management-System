@@ -1,14 +1,10 @@
-@font-face {
-  font-family: "ageer";
-  src: url("./assets/ageer2/Ageer-PersonalUse.otf");
-  /* src: local("Euclid Circular A Bold"), local("EuclidCircularA-Bold"),
-    url("./assets/font/EuclidCircularA-Bold.eot?#iefix")
-      format("embedded-opentype"),
-    url("./assets/font/EuclidCircularA-Bold.woff2") format("woff2"),
-    url("./assets/font/EuclidCircularA-Bold.woff") format("woff"),
-    url("./assets/font/EuclidCircularA-Bold.ttf") format("truetype"); */
-  font-weight: bold;
-  font-style: normal;
+@import url("https://fonts.googleapis.com/css2?family=KoHo:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Karla:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap");
+
+.font-koho {
+  font-family: "KoHo", sans-serif !important;
 }
 
-
+.font-karla {
+  font-family: "Karla", sans-serif !important;
+}

@@ -9,7 +9,6 @@ import Sidebar from "./components/sidebar/sidebar";
 // import DefaultHeader from "./components/default-header/default-header";
 // import ModalComponents from "./components/ModalComponents";
 import { useDispatch, useSelector } from "react-redux";
-import Background from "./components/mackground/background.component";
 // import { clearErrors } from "./data/Reducers/ErrorReducer";
 
 const Routers = () => {
