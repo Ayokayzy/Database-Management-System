@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 import { createContext } from "react";
-import { BiCategoryAlt, BiBook, BiBookReader } from "react-icons/bi";
-import { RxPencil2 } from "react-icons/rx";
+import { LiaHomeSolid } from "react-icons/lia";
+import { MdOutlinePerson } from "react-icons/md";
+import { TfiSettings } from "react-icons/tfi";
+import { GoDatabase } from "react-icons/go";
 import { useSelector } from "react-redux";
 import { useState } from "react";
 
@@ -36,91 +38,26 @@ const DataProvider = ({ children }) => {
     {
       name: "Dashboard",
       url: "/dashboard",
-      icon: <BiCategoryAlt className="icon" size={24} />,
-      permission: ["admin", "user", "organisation", "superadmin"],
+      icon: <LiaHomeSolid  size={24} />,
+      permission: ["admin", "user"],
     },
     {
-      name: "Employee",
-      url: "/",
-      icon: <BiBook className="icon" size={24} />,
-      links: [
-        { name: "Directory", url: "/directory" },
-        { name: "Profile", url: "/profile" },
-        { name: "Audit", url: "/audit" },
-        { name: "Onboarding", url: "/onboarding" },
-        { name: "Offbaording", url: "/offboarding" },
-      ],
-      type: "button",
-      permission: ["user", "organisation"],
+      name: "All Users",
+      url: "/all-users",
+      icon: <MdOutlinePerson className="icon" size={24} />,
+      permission: ["admin", "user"],
     },
     {
-      name: "Engagement",
-      url: "/",
-      icon: <BiBook className="icon" size={24} />,
-      links: [
-        { name: "Announcements", url: "/announcements" },
-        { name: "Survey", url: "/survey" },
-        { name: "Feedback", url: "/audit" },
-        { name: "Onboarding", url: "/feedback" },
-      ],
-      type: "button",
-      permission: ["user", "organisation"],
+      name: "Databases",
+      url: "/databases",
+      icon: <GoDatabase className="icon" size={24} />,
+      permission: ["admin", "user"],
     },
     {
-      name: "Leave",
-      url: "/leave",
-      icon: <BiCategoryAlt className="icon" size={24} />,
-      permission: ["admin", "user", "organisation", "superadmin"],
-    },
-    {
-      name: "Finance",
-      url: "/",
-      icon: <BiBook className="icon" size={24} />,
-      links: [
-        { name: "Payroll", url: "/payroll" },
-        { name: "Invoice", url: "/invoice" },
-      ],
-      type: "button",
-      permission: ["user", "organisation"],
-    },
-    {
-      name: "Recruitment",
-      url: "/",
-      icon: <BiBook className="icon" size={24} />,
-      links: [
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-      ],
-      type: "button",
-      permission: ["user", "organisation"],
-    },
-    {
-      name: "Request",
-      url: "/",
-      icon: <BiBook className="icon" size={24} />,
-      links: [
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-      ],
-      type: "button",
-      permission: ["user", "organisation"],
-    },
-    {
-      name: "Performance",
-      url: "/",
-      icon: <BiBook className="icon" size={24} />,
-      links: [
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-        { name: "Sub Menu", url: "/sub-menu" },
-      ],
-      type: "button",
-      permission: ["user", "organisation"],
+      name: "Account Profile",
+      url: "/profile",
+      icon: <TfiSettings className="icon" size={24} />,
+      permission: ["admin", "user"],
     },
   ];
 

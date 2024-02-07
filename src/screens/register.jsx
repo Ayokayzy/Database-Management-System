@@ -9,7 +9,18 @@ import Button from "../components/button/button";
 const Register = () => {
   return (
     <div>
-      <ReuseBox bg={signupBg} hero={signupHero}>
+      <ReuseBox
+        bg={signupBg}
+        hero={signupHero}
+        heading={
+          <p>
+            Welcome to Pitch <span className="font-black">DOXA!</span>
+          </p>
+        }
+        subtext={
+          "Register to gain access to your personalised and matchless database system"
+        }
+      >
         <div className="font-koho">
           <h1 className="text-4xl font-bold text-center mb-16">
             Get started on{" "}
@@ -53,7 +64,7 @@ const Register = () => {
 
 export default Register;
 
-export const ReuseBox = ({ children, bg, hero }) => {
+export const ReuseBox = ({ children, bg, hero, heading, subtext }) => {
   return (
     <div className="grid md:grid-cols-2 h-screen relative z-10">
       <div className="relative col-spa-2">
@@ -67,11 +78,10 @@ export const ReuseBox = ({ children, bg, hero }) => {
           </div>
           <article className="text-white text-center mt-16">
             <h1 className="text-4xl md:text-5xl font-karla font-bold">
-              Welcome to Pitch <span className="font-black">DOXA!</span>
+              {heading}
             </h1>
             <p className="font-karla max-w-sm md:text-xl mx-auto mt-12">
-              Register to gain access to your personalised and matchless
-              database system
+              {subtext}
             </p>
           </article>
           <img src={hero} alt="" className="mt-16" />

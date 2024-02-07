@@ -30,7 +30,7 @@ const App = () => {
     store.dispatch(loadUser());
   }, []);
 
-  const stripePromise = loadStripe(process.env.REACT_APP_STIPE_PUBLISH_KEY);
+  // const stripePromise = loadStripe(process.env.REACT_APP_STIPE_PUBLISH_KEY);
   return (
     <Provider store={store}>
       <DataProvider>

@@ -17,7 +17,7 @@ const generatePage = (pageName, folder) => {
 const PageRender = () => {
 	const { auth } = useContext(GlobalState);
 	const { page, id, step } = useParams();
-	const escape2 = ["view-tasks", "tutor-action", "profile", "student-action"],
+	const escape2 = ["collections", "tutor-action", "profile", "student-action"],
 		navigate = useNavigate();
 
 	useEffect(() => {
@@ -30,7 +30,7 @@ const PageRender = () => {
 		// 	}
 		// }
 		if (auth?.isAuth) {
-			if (["register", "login", "create-account"]?.includes(page)) {
+			if (["collections", "login", "create-account"]?.includes(page)) {
 				navigate("/");
 			}
 		}
@@ -45,7 +45,7 @@ const PageRender = () => {
 		pageName = `${page}/${id}/${"[id]"}`;
 	} else if (id) {
 		if (
-			(page === "students" && escape2.includes(id)) ||
+			(page === "databases" && escape2.includes(id)) ||
 			(page === "tutors" && escape2.includes(id))
 		) {
 			pageName = `${page}/${id}`;
@@ -55,7 +55,7 @@ const PageRender = () => {
 	} else {
 		pageName = `${page}`;
 	}
-	return generatePage(pageName, auth?.isAuth ? "pages" : "screens");
+	return generatePage(pageName, auth?.user ? "pages" : "screens");
 };
 
 export default PageRender;
