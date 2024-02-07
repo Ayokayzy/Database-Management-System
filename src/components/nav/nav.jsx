@@ -46,12 +46,15 @@ const Nav = () => {
               ))}
             </div>
             <div className="action hidden md:block">
-              <button className="bg-white text-black h-10 px-8 rounded-full capitalize">
+              <button
+                className="bg-white text-black h-10 px-8 rounded-full capitalize"
+                onClick={() => navigate("/login")}
+              >
                 login
               </button>
             </div>
             <span
-              className={`md:hidden ${nav && "hidden"}`}
+              className={`md:hidden ${nav && "hidden"} text-white`}
               onClick={toggleNav}
             >
               <FaAlignLeft size={"20px"} />
@@ -60,13 +63,13 @@ const Nav = () => {
 
           {/* mobile nav */}
           <div
-            className={`fixed left-0 top-0 bottom-0 w-96 ${
+            className={`fixed left-0 top-0 bottom-0 w-96 z-50 ${
               !nav && "-ml-96"
             } md:hidden`}
           >
             <nav className={`bg-white z-50 relative h-full`}>
               <div className="p-8">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center text-white">
                   <Brand />
                   <span onClick={toggleNav}>
                     <FaAlignLeft size={"20px"} />
@@ -81,7 +84,10 @@ const Nav = () => {
                     ))}
                   </div>
                   <div className="action mt-10">
-                    <button className="bg-white text-black h-10 px-8 rounded-full capitalize">
+                    <button
+                      className="bg-main text-white h-10 px-8 rounded-md capitalize"
+                      onClick={() => navigate("/login")}
+                    >
                       login
                     </button>
                   </div>

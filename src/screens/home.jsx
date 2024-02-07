@@ -14,12 +14,12 @@ const Home = () => {
   };
   return (
     <>
-      <header id="home" className="bg-main pb-96">
+      <header id="home" className="bg-main pb-40 md:pb-96">
         <Nav />
         <div className="text-center">
           <div className="relative w-fit p-4 py-2 text-white mx-auto text-xs font-medium">
             <div className="absolute inset-0 opacity-30 bg-main rounded-full border border-white"></div>
-            <span className="relative z-20 font-karla">
+            <span className="font-karla">
               DOXA Database Management System
             </span>
           </div>
@@ -46,7 +46,7 @@ const Home = () => {
         <img
           src={require("../assets/hero.png")}
           alt=""
-          className="mx-auto -mt-96"
+          className="mx-auto -mt-40 md:-mt-96"
         />
       </div>
       <section id="about" className="container mx-auto p-4 mt-16">
@@ -99,28 +99,28 @@ const Home = () => {
             <img src={require("../assets/grid-2.png")} alt="" />
           </div>
           <div className="self-center">
-            <h1 className="font-extrabold text-6xl mb-8">
+            <h1 className="font-extrabold text-5xl md:text-6xl mb-8">
               How DOXA DBMS Works
             </h1>
             <p className="mb-8 text-xl text-[#58595D]">
               Lorem ipsum dolor sit amet consectetur. Nulla blandit urna
               ultricies feugiat non morbi luctus malesuada. Etiam massa.
             </p>
-            <div className="flex justify-between">
-              <article>
-                <h1 className="text-4xl font-black">1468%</h1>
+            <div className="flex justify-between flex-wrap">
+              <article className="m max-w-fit"> 
+                <h1 className="text-3xl md:text-4xl font-black">1468%</h1>
                 <p className="mb-4 text-lg text-[#58595D] font-karla font-semibold">
                   ROI
                 </p>
               </article>
-              <article>
-                <h1 className="text-4xl font-black">35%</h1>
+              <article className="m max-w-fit">
+                <h1 className="text-3xl md:text-4xl font-black">35%</h1>
                 <p className="mb-4 text-lg text-[#58595D] font-karla font-semibold">
                   Growth
                 </p>
               </article>
-              <article>
-                <h1 className="text-4xl font-black">20,000</h1>
+              <article className="m max-w-fit">
+                <h1 className="text-3xl md:text-4xl font-black">20,000</h1>
                 <p className="mb-4 text-lg text-[#58595D] font-karla font-semibold">
                   Users
                 </p>
@@ -159,7 +159,7 @@ const Home = () => {
         <h1 className="text-5xl text-center font-black">
           DOXA Unlimited Benefits
         </h1>
-        <div className="mt-8 flex justify-center gap-16">
+        <div className="mt-8 flex justify-center gap-16 flex-wrap">
           <div className="max-w-sm">
             <h3 className="text-3xl font-black">Affordable and Reliable</h3>
             <p className="f text-lg text-[#1B1B1B99] mt-4 font-medium">

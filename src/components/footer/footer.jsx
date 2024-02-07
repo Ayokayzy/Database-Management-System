@@ -9,7 +9,7 @@ import { FaYoutube } from "react-icons/fa6";
 
 const Footer = () => {
   return (
-    <div className="bg-[#1408A0] py-16 text-white font-koho">
+    <div className="bg-[#1408A0] px-4 py-16 text-white font-koho">
       <div className="container mx-auto">
         <div className="grid lg:grid-cols-3 gap-12">
           <div>
@@ -21,7 +21,7 @@ const Footer = () => {
               Aliquam rhoncus ligula est, non pulvinar elit convallis nec. Donec
               mattis odio at.
             </p>
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-4 flex-wrap">
               <FootIcon />
               <FootIcon icon={<BsInstagram />} />
               <FootIcon icon={<FaLinkedinIn />} />
