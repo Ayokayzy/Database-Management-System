@@ -66,10 +66,10 @@ export default Register;
 
 export const ReuseBox = ({ children, bg, hero, heading, subtext }) => {
   return (
-    <div className="grid md:grid-cols-2 h-screen relative z-10">
-      <div className="relative col-spa-2">
-        <div className="absolute inset-0 -top-20 overflow-hidden">
-          <img src={bg} alt="" className="w-full object-left" />
+    <div className="grid md:grid-cols-2 h-screen relative z-10 overflow-auto">
+      <div className="relative col-spa-2 h-full">
+        <div className="absolute inset-0 -top-20 overflow-hidden h-full">
+          <img src={bg} alt="" className="w-full  object-cover object-left" />
         </div>
         <div className="relative z-20 flex flex-col items-center justify-center p-8 mt-16">
           <div className="flex flex-col items-center gap-4 text-white">
@@ -84,10 +84,10 @@ export const ReuseBox = ({ children, bg, hero, heading, subtext }) => {
               {subtext}
             </p>
           </article>
-          <img src={hero} alt="" className="mt-16" />
+          <img src={hero} alt="" className="mt-16 hidden md:block" />
         </div>
       </div>
-      <div className="md:h-full md:w-full bg-white shadow-lg rounded-t-2xl  md:rounded-tr-none md:rounded-l-2xl py-8 overflow-auto col-spa-3 p-8 md:p-16">
+      <div className="md:w-full bg-white shadow-lg rounded-t-2xl  md:rounded-tr-none md:rounded-l-2xl col-spa-3 p-8 md:p-16">
         {children}
       </div>
     </div>
