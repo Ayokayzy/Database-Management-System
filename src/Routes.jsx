@@ -15,21 +15,21 @@ const Routers = () => {
   const location = useLocation(),
     { error, auth } = useSelector((state) => state),
     dispatch = useDispatch();
+    console.log({auth});
   console.log(location);
 
   return (
     <>
-      <ToastContainer position="bottom-center" />
+      <ToastContainer position="top-right" />
       <Sidebar>
-      {auth?.user ? <DefaultHeader /> : null}
-      {/* {navControl() ? <Nav /> : null} */}
-      <Routes>
-        <Route path="/" element={auth?.user ? <Index /> : <Home />} />
-        <Route path="/:page" element={<PageRender />} />
-        <Route path="/:page/:id" element={<PageRender />} />
-        <Route path="/:page/:id/:step" element={<PageRender />} />
-      </Routes>
-      </Sidebar>  
+        {auth?.isAuth ? <DefaultHeader /> : null}
+        <Routes>
+          <Route path="/" element={auth?.isAuth ? <Index /> : <Home />} />
+          <Route path="/:page" element={<PageRender />} />
+          <Route path="/:page/:id" element={<PageRender />} />
+          <Route path="/:page/:id/:step" element={<PageRender />} />
+        </Routes>
+      </Sidebar>
     </>
   );
 };

@@ -11,7 +11,7 @@ const Input = ({ type, label, ...restProps }) => {
   };
   return (
     <div>
-      {type === "email" && (
+      {type === "email" ? (
         <div className="flex flex-col">
           <label className="font-medium text-xl mb-2">{label}</label>
           <div className="relative w-full flex items-center">
@@ -25,8 +25,7 @@ const Input = ({ type, label, ...restProps }) => {
             </span>
           </div>
         </div>
-      )}
-      {type === "password" && (
+      ) : type === "password" ? (
         <div className="flex flex-col">
           <label className="font-medium text-xl mb-2">{label}</label>
           <div className="relative w-full flex items-center">
@@ -35,17 +34,19 @@ const Input = ({ type, label, ...restProps }) => {
               className="outline-none outline-0 bg-[#EEF1FF] rounded-md h-14 border-none px-4 w-full"
               {...restProps}
             />
-            <span className="absolute right-4 cursor-pointer" onClick={toggleShow}>
+            <span
+              className="absolute right-4 cursor-pointer"
+              onClick={toggleShow}
+            >
               <PasswordIcon />
             </span>
           </div>
         </div>
-      )}
-      {type === "text" && (
+      ) : (
         <div className="flex flex-col">
           <label className="font-medium text-xl mb-2">{label}</label>
           <input
-            type="text"
+            type={type}
             className="outline-none outline-0 bg-[#EEF1FF] rounded-md h-14 border-none px-4"
             {...restProps}
           />

@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const SetAuthToken = token => {
 	if (token) {
-		axios.defaults.headers.common["Authorization"] = token;
+		axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 		axios.defaults.headers.common["frontend-source"] = "web user";
 	} else {
 		delete axios.defaults.headers.common["Authorization"];

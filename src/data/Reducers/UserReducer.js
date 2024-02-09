@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 // import { clearErrors, getErrorText } from "./ErrorReducer";
-// import { SetAuthToken } from "../Config";
-// import axios from "axios";
+import { SetAuthToken } from "../Config";
+import axios from "axios";
 // import { toast } from "react-toastify";
 
 export const TOKEN = "DOXA_LOGIN";
 
 let initialState = {
-  user: null,
+  user: {},
+  isAuth: false,
+  isAdmin: false,
 };
 
 export const userSlice = createSlice({
@@ -15,32 +17,57 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, { payload }) => {
-      localStorage.setItem(TOKEN, payload);
-	  state.user = payload;
+      localStorage.setItem(TOKEN, payload?.token);
+      state.user = payload?.user ? payload?.user : null;
+      state.isAuth = true;
     },
     setUser: (state, { payload }) => {
-      state.isUpdated = true;
-      state.user = payload;
+      if (payload) {
+        state.user = payload?.data ? payload?.data : null;
+      }
+    },
+    setAuth: (state, { payload }) => {
+      state.isAuth = payload;
+    },
+    setAdmin: (state, { payload }) => {
+      state.isAdmin = payload ? payload : false;
     },
     getUser: (state, { payload }) => {
       if (payload?.token) {
         localStorage.setItem(TOKEN, payload?.token);
       }
+      state.user = payload;
+      state.isAuth = true;
     },
+
     logout: (state) => {
       localStorage.removeItem(TOKEN);
       state.user = null;
+      state.isAuth = false;
+      state.isAdmin = false;
     },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { login, logout, getUser, setUser } = userSlice.actions;
+export const { login, logout, getUser, setUser, setAdmin, setAuth } =
+  userSlice.actions;
 
 export default userSlice.reducer;
 
 // GET USER INFO
 export const loadUser = () => async (dispatch) => {
-  let auth =  localStorage.getItem(TOKEN);
-  dispatch(setUser(auth))
+  let token = localStorage.getItem(TOKEN);
+  if (token) SetAuthToken(token);
+
+  try {
+    const res = await axios.get("/user");
+    if (res.data?.admin) dispatch(setAdmin(true));
+    console.log({ res });
+    dispatch(setAuth(true));
+    dispatch(getUser(res.data?.data));
+  } catch (err) {
+    dispatch(setAuth(false));
+    console.log(err);
+  }
 };

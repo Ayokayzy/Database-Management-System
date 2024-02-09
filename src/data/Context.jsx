@@ -39,19 +39,19 @@ const DataProvider = ({ children }) => {
       name: "Dashboard",
       url: "/dashboard",
       icon: <LiaHomeSolid  size={24} />,
-      permission: ["admin", "user"],
+      permission: ["admin"],
     },
     {
       name: "All Users",
       url: "/all-users",
       icon: <MdOutlinePerson className="icon" size={24} />,
-      permission: ["admin", "user"],
+      permission: ["admin"],
     },
     {
       name: "Databases",
       url: "/databases",
       icon: <GoDatabase className="icon" size={24} />,
-      permission: ["admin", "user"],
+      permission: ["user"],
     },
     {
       name: "Account Profile",

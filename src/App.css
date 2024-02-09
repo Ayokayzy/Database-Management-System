@@ -8,3 +8,16 @@
 .font-karla {
   font-family: "Karla", sans-serif !important;
 }
+
+.otp-code__input {
+  border-radius: 0.5rem;
+  font-family: monospace;
+  height: 50px;
+  border: 1px solid #ccc;
+  font-size: 2rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: #222;
+  width: 3rem !important;
+  margin: 0 0.5rem;
+}

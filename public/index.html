@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="logo-green.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta
@@ -24,10 +24,102 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Doxa</title>
+    <style>
+      .preloader {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        z-index: 999999999 !important;
+        background: #fff;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      .ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150px;
+        height: 150px;
+        background: transparent;
+        border: 3px solid #3c3c3c;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 150px;
+        font-family: sans-serif;
+        font-size: 20px;
+        color: #101840;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        text-shadow: 0 0 10px #101840;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+      .ring:before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        width: 100%;
+        height: 100%;
+        border: 3px solid transparent;
+        border-top: 3px solid #101840;
+        border-right: 3px solid #101840;
+        border-radius: 50%;
+        animation: animateC 2s linear infinite;
+      }
+      .preloader span {
+        display: block;
+        position: absolute;
+        top: calc(50% - 2px);
+        left: 50%;
+        width: 50%;
+        height: 4px;
+        background: transparent;
+        transform-origin: left;
+        animation: animate 2s linear infinite;
+      }
+      .preloader span:before {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #101840;
+        top: -6px;
+        right: -8px;
+        box-shadow: 0 0 20px #101840;
+      }
+      @keyframes animateC {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes animate {
+        0% {
+          transform: rotate(45deg);
+        }
+        100% {
+          transform: rotate(405deg);
+        }
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div class="preloader preloader-dark">
+      <div class="lds-ellipsis">
+        <div class="ring">
+          Loading
+          <span></span>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
     <!--
       This HTML file is a template.
