@@ -6,7 +6,7 @@ import Input from "../components/input/input";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/button/button";
 import { useDispatch } from "react-redux";
-import { login } from "../data/Reducers/UserReducer";
+import { loadUser, login } from "../data/Reducers/UserReducer";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -60,6 +60,7 @@ const Login = () => {
       toggleModal();
       toast.success(res.data?.message);
       dispatch(login(res.data?.data));
+      dispatch(loadUser());
       navigate("/");
     } catch (err) {
       console.log(err);

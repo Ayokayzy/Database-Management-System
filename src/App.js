@@ -11,6 +11,7 @@ import { TOKEN, loadUser } from "./data/Reducers/UserReducer";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { SetAuthToken, SetDefaultHeaders } from "./data/Config";
+import { PersistGate } from "redux-persist/integration/react";
 
 // Preloader
 $(window).on("load", function () {
@@ -29,15 +30,18 @@ const App = () => {
   useEffect(() => {
     store.dispatch(loadUser());
   }, []);
+  // const { store, persistor } = storeConfig();
 
   // const stripePromise = loadStripe(process.env.REACT_APP_STIPE_PUBLISH_KEY);
   return (
     <Provider store={store}>
-      <DataProvider>
-        <Router>
-          <Routers />
-        </Router>
-      </DataProvider>
+      {/* <PersistGate loading={null} persistor={persistor}> */}
+        <DataProvider>
+          <Router>
+            <Routers />
+          </Router>
+        </DataProvider>
+      {/* </PersistGate> */}
     </Provider>
   );
 };

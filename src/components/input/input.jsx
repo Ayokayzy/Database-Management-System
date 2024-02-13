@@ -47,7 +47,7 @@ const Input = ({ type, label, ...restProps }) => {
           <label className="font-medium text-xl mb-2">{label}</label>
           <input
             type={type}
-            className="outline-none outline-0 bg-[#EEF1FF] rounded-md h-14 border-none px-4"
+            className="outline-none outline-0 bg-[#EEF1FF] rounded-md h-14 border-none px-4 capitalize"
             {...restProps}
           />
         </div>

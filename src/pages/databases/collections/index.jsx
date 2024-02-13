@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosAdd } from "react-icons/io";
 import DatabaseCard from "../../../components/database-card/database-card";
 
@@ -9,11 +9,54 @@ import ModalContainer from "../../../components/modal-container/modal-container"
 import Input from "../../../components/input/input";
 import { ClipLoader } from "react-spinners";
 import { IoMdAdd } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCurrentDatabAse } from "../../../data/selectors/databaseSelector";
+import { toast } from "react-toastify";
+import axios from "axios";
+import {
+  fetchAllCollections,
+  fetchCollectionDetails,
+} from "../../../data/Reducers/collectionSlice";
+import {
+  selectCollection,
+  selectCollectionDetails,
+} from "../../../data/selectors/collectionSelector";
+
+const defaultField = {
+  name: "",
+  required: "",
+  unique: "",
+  dataType: "",
+};
 
 const Collections = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState("create");
   const [field, setField] = useState("");
+  const currentDatabase = useSelector(selectCurrentDatabAse);
+  const collection = useSelector(selectCollection);
+  const collectionDetails = useSelector(selectCollectionDetails);
+  console.log(currentDatabase);
+  const [fieldsData, setFieldsData] = useState(defaultField);
+  const defaultCollection = {
+    database: currentDatabase,
+    name: "",
+    fields: [],
+  };
+  const [collectionData, setCollectionData] = useState(defaultCollection);
+
+  const handleField = (e) => {
+    const { name, value } = e.target;
+    setFieldsData({ ...fieldsData, [name]: value });
+  };
+
+  const cannotBeUnique = (dataType) => {
+    return ["image", "video", "document", "link to another file"].includes(
+      dataType
+    );
+  };
+
+  const dispatch = useDispatch();
 
   const [deleteModal, setDeleteModal] = useState(false),
     [createModal, setCreateModal] = useState(false),
@@ -30,8 +73,64 @@ const Collections = () => {
       setSuccessModal(!successModal);
     },
     closeField = () => {
+      setCollectionData(defaultCollection);
       setField("");
     };
+
+  const closeCreateModal = () => {
+    closeField();
+    setCreateModal(false);
+  };
+
+  const createCollection = async () => {
+    setIsLoading(true);
+    console.log(collectionData);
+    try {
+      const res = await axios.post("/collection", collectionData);
+      console.log(res);
+      dispatch(fetchAllCollections(currentDatabase));
+      setIsLoading(false);
+      closeField();
+      toast.success(res.data.message);
+      toggleSuccessModal();
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+
+  const editCollection = async () => {
+    setIsLoading(true);
+    console.log(collectionData);
+    let data = {
+      ...collectionData,
+      fields: collectionData.fields.map((item) => ({
+        ...item,
+        unique: String(item.unique),
+        required: String(item.required),
+      })),
+    };
+    console.log(data);
+    try {
+      const res = await axios.put("/collection", data);
+      console.log(res);
+      dispatch(fetchAllCollections(currentDatabase));
+      setIsLoading(false);
+      closeField();
+      toast.success(res.data.message);
+      toggleSuccessModal();
+      toggleCreateModal()
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(fetchAllCollections(currentDatabase));
+  }, []);
   return (
     <div className="m-4 min-h-screen bg-white p-8">
       <div className="flex justify-between">
@@ -49,35 +148,48 @@ const Collections = () => {
         </button>
       </div>
       <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
-        <DatabaseCard handleClick={() => navigate("/databases/collections/id")}>
-          <div className="p-8">
-            <div className="flex items-center gap-8 ml-4">
-              <img src={require(`../../../assets/${"db.png"}`)} alt="" />
-              <p className="font-medium text-lg">Database Name</p>
-            </div>
-            <div className="my-4 space-y-2">
-              <p className="font-semibold text-lg">Documents: 5</p>
-            </div>
-            <div className="flex justify-end w-fit ml-auto relative z-30">
-              <div className="flex items-center gap-2">
-                <button
-                  className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                  onClick={() => toggleCreateModal("edit")}
-                >
-                  <MdOutlineEdit />
-                </button>
-                <button
-                  className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                  onClick={toggleDeleteModal}
-                >
-                  <RiDeleteBin5Line />
-                </button>
+        {collection?.map((data) => (
+          <DatabaseCard
+            handleClick={() => navigate("/databases/collections/id")}
+          >
+            <div className="p-8">
+              <div className="flex items-center gap-8 ml-4 mb-12">
+                <img src={require(`../../../assets/${"db.png"}`)} alt="" />
+                <p className="font-medium text-lg capitalize">{data.name}</p>
+              </div>
+              {/* <div className="my-4 space-y-2">
+                <p className="font-semibold text-lg">Documents: 5</p>
+              </div> */}
+              <div className="flex justify-end w-fit ml-auto relative z-30">
+                <div className="flex items-center gap-2">
+                  <button
+                    className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                    onClick={() => {
+                      setCollectionData({
+                        name: data?.name,
+                        fields: data?.fields,
+                        database: data?.database,
+                        _id: data._id
+                      });
+                      console.log({ collectionData });
+                      toggleCreateModal("edit");
+                    }}
+                  >
+                    <MdOutlineEdit />
+                  </button>
+                  <button
+                    className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                    onClick={toggleDeleteModal}
+                  >
+                    <RiDeleteBin5Line />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </DatabaseCard>
+          </DatabaseCard>
+        ))}
       </div>
-      <ModalContainer show={createModal} close={toggleCreateModal}>
+      <ModalContainer show={createModal} close={closeCreateModal}>
         <div>
           <div className="text-center">
             <h3 className="text-2xl font-medium text-[#1400FF] uppercase">
@@ -85,31 +197,36 @@ const Collections = () => {
             </h3>
           </div>
           <div>
-            <Input type={"text"} label={"Collection name"} />
+            <Input
+              type={"text"}
+              label={"Collection name"}
+              onChange={(e) =>
+                setCollectionData({ ...collectionData, name: e.target.value })
+              }
+              value={collectionData.name}
+            />
             {mode === "edit" && (
               <div className="my-8 text-center">
                 <h3 className="text-2xl font-medium text-[#1400FF] uppercase">
                   Edit Fields
                 </h3>
                 <div className="space-y-2 mt-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-normal">Field Name</p>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={() => setField("add")}
-                    >
-                      <MdOutlineEdit />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-normal">Field Name</p>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={() => setField("add")}
-                    >
-                      <MdOutlineEdit />
-                    </button>
-                  </div>
+                  {collectionData?.fields?.map((field) => (
+                    <div className="flex items-center justify-between">
+                      <p className="text-xl font-normal">{field.name}</p>
+                      <button
+                        className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                        onClick={() => {
+                          let { name, unique, required, dataType } = field;
+                          setFieldsData(field);
+                          setField("add");
+                          setMode("edit");
+                        }}
+                      >
+                        <MdOutlineEdit />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -118,8 +235,12 @@ const Collections = () => {
                 <button
                   className="p-2 rounded-md bg-gray-200"
                   onClick={() => {
-                    toggleCreateModal();
-                    setField("add");
+                    if (collectionData.name) {
+                      toggleCreateModal();
+                      setField("add");
+                    } else {
+                      toast.error("Add a collection name");
+                    }
                   }}
                 >
                   <IoMdAdd />
@@ -136,24 +257,25 @@ const Collections = () => {
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"
-                disabled={isLoading}
-                color={"#ffffff"}
-                onClick={() => {
-                  toggleCreateModal();
-                  toggleSuccessModal();
-                }}
-              >
-                {isLoading ? (
-                  <span className="text-white flex items-center justify-center">
-                    Update <ClipLoader size={20} color="#fff" />
-                  </span>
-                ) : (
-                  "Invite"
-                )}
-              </button>
+              {mode == "edit" && (
+                <button
+                  type="submit"
+                  className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"
+                  disabled={isLoading}
+                  color={"#ffffff"}
+                  onClick={editCollection}
+                >
+                  {isLoading ? (
+                    <span className="text-white flex items-center justify-center">
+                      <ClipLoader size={20} color="#fff" />
+                    </span>
+                  ) : mode === "create" ? (
+                    "Create"
+                  ) : (
+                    "Edit"
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -172,10 +294,48 @@ const Collections = () => {
           <div>
             {field === "add" ? (
               <div className="space-y-4 mt-8">
-                <EditInput label={"Field Name"} type={"text"} />
-                <EditInput label={"Data Type"} type={"select"} />
-                <EditInput label={"Required"} type={"select"} />
-                <EditInput label={"Unique"} type={"select"} />
+                <EditInput
+                  label={"Field Name"}
+                  type={"text"}
+                  value={fieldsData.name}
+                  onChange={handleField}
+                  name={"name"}
+                />
+                <EditInput
+                  label={"Data Type"}
+                  type={"select"}
+                  options={[
+                    "Numeric value",
+                    "Text",
+                    "Image",
+                    "Video",
+                    "Document",
+                    "Link to another file",
+                  ]}
+                  onChange={handleField}
+                  value={fieldsData.dataType}
+                  name={"dataType"}
+                />
+                <EditInput
+                  label={"Required"}
+                  type={"select"}
+                  options={["True", "False"]}
+                  onChange={handleField}
+                  value={fieldsData.required}
+                  name={"required"}
+                />
+                <EditInput
+                  label={"Unique"}
+                  type={"select"}
+                  options={
+                    cannotBeUnique(fieldsData.dataType)
+                      ? ["False"]
+                      : ["True", "False"]
+                  }
+                  onChange={handleField}
+                  name={"unique"}
+                  value={fieldsData.unique}
+                />
               </div>
             ) : (
               <div className="m max-h-96 overflow-y-auto scrollbar-hide">
@@ -183,40 +343,25 @@ const Collections = () => {
                   <b>Name: Students</b>
                 </p>
                 <p className="text-lg font-medium">Fields</p>
-                <div className="p-4 rounded-md space-y-4 shadow-lg m-4">
-                  <p>Name: Student</p>
-                  <p>Username: True</p>
-                  <p>Name: Student</p>
-                  <p>Name: Student</p>
-                  <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
-                      <MdOutlineEdit />
-                    </button>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={toggleDeleteModal}
-                    >
-                      <RiDeleteBin5Line />
-                    </button>
+                {collectionData?.fields?.map((data) => (
+                  <div className="p-4 rounded-md space-y-4 shadow-lg m-4">
+                    <p>Name: {data.name}</p>
+                    <p>Data Type: {data.dataType}</p>
+                    <p>Required: {data.required}</p>
+                    <p>Unique: {data?.unique}</p>
+                    <div className="flex items-center justify-end gap-2">
+                      <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
+                        <MdOutlineEdit />
+                      </button>
+                      <button
+                        className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                        onClick={toggleDeleteModal}
+                      >
+                        <RiDeleteBin5Line />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="p-4 rounded-md space-y-4 shadow-lg m-4">
-                  <p>Name: Student</p>
-                  <p>Username: True</p>
-                  <p>Name: Student</p>
-                  <p>Name: Student</p>
-                  <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
-                      <MdOutlineEdit />
-                    </button>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={toggleDeleteModal}
-                    >
-                      <RiDeleteBin5Line />
-                    </button>
-                  </div>
-                </div>
+                ))}
               </div>
             )}
             {field === "add more" && mode !== "edit" && (
@@ -236,7 +381,7 @@ const Collections = () => {
                   className="h-10 w-24 border-2 border-main rounded-xl text-main barlow text-base font-normal"
                   color={"#ffffff"}
                   onClick={() => {
-                    closeField();
+                    setField("");
                   }}
                 >
                   Candel
@@ -249,27 +394,45 @@ const Collections = () => {
                 color={"#ffffff"}
                 onClick={() => {
                   console.log(field);
+                  console.log(fieldsData);
+                  console.log(collectionData.fields);
                   if (field === "add") {
-                    console.log("in here");
-                    setField("add more");
+                    if (
+                      !fieldsData.name ||
+                      !fieldsData.dataType ||
+                      fieldsData.required === "" ||
+                      fieldsData.unique === ""
+                    )
+                      return toast.error("Select all fields");
+                    if (mode === "create") {
+                      collectionData.fields.push(fieldsData);
+                      setField("add more");
+                    } else {
+                      let newArr = collectionData.fields.filter(
+                        (item) => item._id !== fieldsData._id
+                      );
+                      newArr.push(fieldsData);
+                      collectionData.fields = [...newArr];
+                      setField("");
+                    }
+                    setFieldsData(defaultField);
                   } else {
-                    closeField();
-                    toggleSuccessModal();
+                    createCollection();
                   }
                 }}
               >
                 {isLoading ? (
                   <span className="text-white flex items-center justify-center">
-                    Update <ClipLoader size={20} color="#fff" />
+                    <ClipLoader size={20} color="#fff" />
                   </span>
                 ) : field === "add" ? (
-                  mode == "add" ? (
+                  mode == "create" ? (
                     "Add"
                   ) : (
                     "Edit"
                   )
                 ) : (
-                  "Create"
+                  "Create collection"
                 )}
               </button>
             </div>
@@ -336,23 +499,31 @@ const Collections = () => {
 
 export default Collections;
 
-const EditInput = ({ type, label, options = [] }) => {
+const EditInput = ({ type, label, options = [], ...restProps }) => {
   return (
     <div>
       {type === "select" ? (
         <div className="flex items-center gap-4">
           <label className="font-semibold whitespace-nowrap">{label}:</label>
-          <select name="" className="h-10 border-2 rounded-md px-4 w-full">
+          <select
+            name=""
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          >
             <option value="">--select--</option>
             {options.map((option) => (
-              <option value={option}>{option}</option>
+              <option value={option.toLowerCase()}>{option}</option>
             ))}
           </select>
         </div>
       ) : (
         <div className="flex items-center gap-4">
           <label className="font-semibold whitespace-nowrap">{label}:</label>
-          <input type="text" className="h-10 border-2 rounded-md px-4 w-full" />
+          <input
+            type="text"
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          />
         </div>
       )}
     </div>

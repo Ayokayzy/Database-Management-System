@@ -17,7 +17,7 @@ const generatePage = (pageName, folder) => {
 const PageRender = () => {
   const { auth } = useContext(GlobalState);
   const { page, id, step } = useParams();
-  const escape2 = ["collections", "tutor-action", "profile", "student-action"],
+  const escape2 = ["collections"],
     navigate = useNavigate();
 
   useEffect(() => {
@@ -29,8 +29,18 @@ const PageRender = () => {
       // clearErrors();
       // }
     }
+    if (auth.isAdmin) {
+      if (["database"].includes(page)) {
+        return navigate("/");
+      }
+    }
+    if (!auth.isAdmin) {
+      if (["dashboard", "all-users"].includes(page)) {
+        return navigate("/databases")
+      }
+    }
     if (auth?.isAuth) {
-      if (["collections", "login", "create-account"]?.includes(page)) {
+      if (["collections", "login"]?.includes(page)) {
         navigate("/");
       }
     }

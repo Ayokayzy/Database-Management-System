@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // import { clearErrors, getErrorText } from "./ErrorReducer";
 import { SetAuthToken } from "../Config";
 import axios from "axios";
+import { getAllDatabase } from "./databaseSlice";
 // import { toast } from "react-toastify";
 
 export const TOKEN = "DOXA_LOGIN";
@@ -63,6 +64,7 @@ export const loadUser = () => async (dispatch) => {
   try {
     const res = await axios.get("/user");
     if (res.data?.admin) dispatch(setAdmin(true));
+    dispatch(getAllDatabase());
     console.log({ res });
     dispatch(setAuth(true));
     dispatch(getUser(res.data?.data));

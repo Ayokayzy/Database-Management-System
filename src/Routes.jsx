@@ -15,8 +15,6 @@ const Routers = () => {
   const location = useLocation(),
     { error, auth } = useSelector((state) => state),
     dispatch = useDispatch();
-    console.log({auth});
-  console.log(location);
 
   return (
     <>
