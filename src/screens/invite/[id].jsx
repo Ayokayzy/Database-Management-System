@@ -23,7 +23,7 @@ const VerifyToken = () => {
         dispatch(verifyUser(true));
         // return toast.error(err.response?.data?.message);
       }
-      navigate("/success")
+      navigate("/invite")
     };
     handleVerifyUser();
   }, []);
