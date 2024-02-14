@@ -5,9 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { setVerifyMsg, verifyUser } from "../../data/Reducers/databaseSlice";
 
 const VerifyToken = () => {
-  const id = useParams();
+  const { id } = useParams();
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   console.log(id);
   useEffect(() => {
     const handleVerifyUser = async () => {
@@ -23,7 +23,7 @@ const VerifyToken = () => {
         dispatch(verifyUser(true));
         // return toast.error(err.response?.data?.message);
       }
-      navigate("/invite")
+      navigate("/invite");
     };
     handleVerifyUser();
   }, []);
