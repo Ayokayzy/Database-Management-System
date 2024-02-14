@@ -19,7 +19,7 @@ export const databaseSlice = createSlice({
       state.currentDatabase = payload;
     },
     verifyUser: (state, { payload }) => {
-      state.verifyUser = payload);
+      state.verifyUser = payload;
     },
     setVerifyMsg: (state, { payload }) => {
       state.verifyMsg = payload;
