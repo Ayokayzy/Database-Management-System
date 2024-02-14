@@ -19,17 +19,22 @@ import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { EditInput } from "..";
+import { fetchAllDocuments } from "../../../../data/Reducers/documentsSlice";
+import { selectAllDocuments } from "../../../../data/selectors/documentSelector";
 
 const Document = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const collectionId = useSelector(selectCurrentCollection);
   const databaseId = useSelector(selectCurrentDatabAse);
+  const documents = useSelector(selectAllDocuments);
   const collectionSchema = useSelector(selectCollectionDetails);
   console.log(collectionSchema);
+  console.log(documents);
 
   const [mode, setMode] = useState("create");
-  const [field, setField] = useState("");
+  const [fieldsData, setFieldsData] = useState({});
+  const [editData, setEditData] = useState({});
   const [deleteModal, setDeleteModal] = useState(false),
     [createModal, setCreateModal] = useState(false),
     [isLoading, setIsLoading] = useState(false),
@@ -43,19 +48,116 @@ const Document = () => {
     },
     toggleSuccessModal = () => {
       setSuccessModal(!successModal);
-    },
-    closeField = () => {
-      // setCollectionData(defaultCollection);
-      setField("");
     };
+  const handleField = (e) => {
+    const { name, value } = e.target;
+    setFieldsData({ ...fieldsData, [name]: value });
+  };
 
   const closeCreateModal = () => {
-    closeField();
     setCreateModal(false);
   };
 
+  const createDocument = async (e) => {
+    e.preventDefault();
+    handleEditData(editData);
+    console.log(fieldsData);
+    if (!fieldsData) return toast.error("All fields are required");
+    let flag = 0;
+    Object.keys(fieldsData).forEach((data) => {
+      if (!fieldsData[data]) {
+        flag++;
+      }
+    });
+    if (flag > 0) {
+      return toast.error("All fields are required");
+    }
+    const data = {
+      collectionId,
+      database: databaseId,
+      ...fieldsData,
+    };
+    const myEditData = {
+      ...fieldsData,
+      _id: editData._id,
+    };
+    console.log(data);
+    console.log(mode);
+    console.log(myEditData);
+    setIsLoading(true);
+    try {
+      let res;
+      if (mode === "create") {
+        res = await axios.post("/document", data);
+      } else {
+        res = await axios.put("/document", myEditData);
+      }
+      console.log(res);
+      dispatch(fetchAllDocuments(databaseId, collectionId));
+      setIsLoading(false);
+      toggleCreateModal();
+      // toggleSuccessModal();
+      setFieldsData({});
+      toast.success(res.data?.message);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+
+  // const handleEdit = (doc) => {
+  //   let inputDetails = {};
+  //   setEditData(doc);
+  //   console.log(doc);
+  //   doc?.text?.map((field) => {
+  //     inputDetails[field.name] = field.value;
+  //   });
+  //   setFieldsData(inputDetails);
+  //   toggleCreateModal("edit");
+  // };
+
+  const handleEdit = (doc) => {
+    let inputDetails = {};
+    setEditData(doc);
+    console.log(doc);
+    doc?.text?.map((field) => {
+      inputDetails[field.name] = field.value;
+    });
+    setFieldsData(inputDetails);
+    toggleCreateModal("edit");
+  };
+
+  const handleEditData = (doc) => {
+    let editedDoc = {
+      ...doc,
+      text: doc?.text?.map((item) => ({
+        ...item,
+        value: fieldsData[item.name],
+      })),
+    };
+    console.log(editedDoc);
+    setEditData(editedDoc);
+  };
+
+  const deleteDocument = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.delete(`/document/${editData._id}`);
+      dispatch(fetchAllDocuments(databaseId, collectionId));
+      setIsLoading(false);
+      toggleDeleteModal();
+      // toggleSuccessModal();
+      toast.success(res.data?.message);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+
   useEffect(() => {
-    dispatch(fetchCollectionDetails(collectionId, databaseId));
+    dispatch(fetchAllDocuments(databaseId, collectionId));
   }, []);
   return (
     <div className="m-4 min-h-screen bg-white p-8">
@@ -76,50 +178,65 @@ const Document = () => {
         </div>
       </div>
       <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
-        <DatabaseCard>
-          <div className="p-6">
-            <div className="my-2 space-y-1">
-              <p className="text-lg">
-                First Name: <b>Arawole</b>
-              </p>
-              <p className="text-lg">
-                Age: <b>23</b>
-              </p>
-              <p className="text-lg">
-                Education: <b>Lautech</b>
-              </p>
-              <p className="text-lg">
-                Picture:{" "}
-                <span>
-                  <button className="border-2 rounded p-2 font-medium text-sm">
-                    View
-                  </button>{" "}
-                  <button className="border-2 rounded p-2 font-medium text-sm">
-                    Download
-                  </button>{" "}
-                </span>
-              </p>
-              <p className="text-lg">
-                <span>
-                  CV:{" "}
-                  <button className="border-2 rounded p-2 font-medium text-sm">
-                    Download
-                  </button>
-                </span>
-              </p>
-            </div>
-            <div className="flex justify-end">
-              <div className="flex items-center gap-2">
-                <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
-                  <MdOutlineEdit />
-                </button>
-                <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
-                  <RiDeleteBin5Line />
-                </button>
+        {documents?.map((document) => (
+          <DatabaseCard>
+            <div className="p-6">
+              <div className="my-2 space-y-1">
+                {document.text?.map((file) => (
+                  <p className="text-lg">
+                    {file.name} <b>{file.value}</b>
+                  </p>
+                ))}
+                {/* <p className="text-lg">
+                  Age: <b>23</b>
+                </p>
+                <p className="text-lg">
+                  Education: <b>Lautech</b>
+                </p>
+                <p className="text-lg">
+                  Picture:{" "}
+                  <span>
+                    <button className="border-2 rounded p-2 font-medium text-sm">
+                      View
+                    </button>{" "}
+                    <button className="border-2 rounded p-2 font-medium text-sm">
+                      Download
+                    </button>{" "}
+                  </span>
+                </p>
+                <p className="text-lg">
+                  <span>
+                    CV:{" "}
+                    <button className="border-2 rounded p-2 font-medium text-sm">
+                      Download
+                    </button>
+                  </span>
+                </p> */}
+              </div>
+              <div className="relative h-8 z-50">
+                <div className="flex justify-end">
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                      onClick={() => handleEdit(document)}
+                    >
+                      <MdOutlineEdit />
+                    </button>
+                    <button
+                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                      onClick={() => {
+                        setEditData(document);
+                        toggleDeleteModal();
+                      }}
+                    >
+                      <RiDeleteBin5Line />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </DatabaseCard>
+          </DatabaseCard>
+        ))}
       </div>
       <ModalContainer show={createModal} close={closeCreateModal}>
         <div>
@@ -128,226 +245,46 @@ const Document = () => {
               {mode === "create" ? "Create Document" : "Edit Dociment"}
             </h3>
           </div>
-          <div>
-            <EditInput
-              type={"text"}
-              label={"Collection name"}
-              onChange={(e) => {}}
-            />
-            {mode === "edit" && (
-              <div className="my-8 text-center">
-                <h3 className="text-2xl font-medium text-[#1400FF] uppercase">
-                  Edit Fields
-                </h3>
-                <div className="space-y-2 mt-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xl font-normal">{field.name}</p>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={() => {}}
-                    >
-                      <MdOutlineEdit />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            {mode === "create" && (
-              <div className="flex justify-end items-center gap-2 mt-2">
-                <button
-                  className="p-2 rounded-md bg-gray-200"
-                  onClick={() => {}}
-                >
-                  <IoMdAdd />
-                </button>
-                <p>Add field</p>
-              </div>
-            )}
+          <form className="my-8 space-y-4" onSubmit={createDocument}>
+            {collectionSchema?.fields?.map((field) => (
+              <SchemaInputs
+                type={field.dataType}
+                label={field.name}
+                name={field.name}
+                value={fieldsData[field.name]}
+                onChange={handleField}
+              />
+            ))}
             <div className="flex justify-center gap-8 mt-8">
               <button
                 type="reset"
                 className="h-10 w-24 border-2 border-main rounded-xl text-main barlow text-base font-normal"
                 color={"#ffffff"}
-                onClick={toggleCreateModal}
+                onClick={() => {
+                  setFieldsData({});
+                  toggleCreateModal();
+                }}
               >
                 Cancel
               </button>
-              {mode == "edit" && (
-                <button
-                  type="submit"
-                  className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"
-                  disabled={isLoading}
-                  color={"#ffffff"}
-                  onClick={() => {}}
-                >
-                  {isLoading ? (
-                    <span className="text-white flex items-center justify-center">
-                      <ClipLoader size={20} color="#fff" />
-                    </span>
-                  ) : mode === "create" ? (
-                    "Create"
-                  ) : (
-                    "Edit"
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </ModalContainer>
-      <ModalContainer show={field} close={closeField}>
-        <div>
-          <div className="text-center">
-            <h3 className="text-2xl font-semibold uppercase">
-              {field === "add"
-                ? mode === "create"
-                  ? "Add Field"
-                  : "Edit field"
-                : "Add More"}
-            </h3>
-          </div>
-          <div>
-            {field === "add" ? (
-              <div className="space-y-4 mt-8">
-                <EditInput
-                  label={"Field Name"}
-                  type={"text"}
-                  // value={fieldsData.name}
-                  // onChange={handleField}
-                  // name={"name"}
-                />
-                <EditInput
-                  label={"Data Type"}
-                  type={"select"}
-                  options={[
-                    "Numeric value",
-                    "Text",
-                    "Image",
-                    "Video",
-                    "Document",
-                    "Link to another file",
-                  ]}
-                  // onChange={handleField}
-                  // value={fieldsData.dataType}
-                  // name={"dataType"}
-                />
-                <EditInput
-                  label={"Required"}
-                  type={"select"}
-                  options={["True", "False"]}
-                  // onChange={handleField}
-                  // value={fieldsData.required}
-                  // name={"required"}
-                />
-                <EditInput
-                  label={"Unique"}
-                  type={"select"}
-                  // options={
-                  //   cannotBeUnique(fieldsData.dataType)
-                  //     ? ["False"]
-                  //     : ["True", "False"]
-                  // }
-                  // onChange={handleField}
-                  // name={"unique"}
-                  // value={fieldsData.unique}
-                />
-              </div>
-            ) : (
-              <div className="m max-h-96 overflow-y-auto scrollbar-hide">
-                <p className="text-xl">
-                  <b>Name: Students</b>
-                </p>
-                <p className="text-lg font-medium">Fields</p>
-                <div className="p-4 rounded-md space-y-4 shadow-lg m-4">
-                  <p>Name: name</p>
-                  <p>Data Type: data type</p>
-                  <p>Required: required</p>
-                  <p>Unique: unique</p>
-                  <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
-                      <MdOutlineEdit />
-                    </button>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={toggleDeleteModal}
-                    >
-                      <RiDeleteBin5Line />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            {field === "add more" && mode !== "edit" && (
-              <div className="flex justify-end items-center gap-2 mt-2">
-                <button
-                  className="p-2 rounded-md bg-gray-200"
-                  onClick={() => setField("add")}
-                >
-                  <IoMdAdd />
-                </button>
-              </div>
-            )}
-            <div className="flex justify-center gap-8 mt-8">
-              {mode === "edit" && (
-                <button
-                  type="reset"
-                  className="h-10 w-24 border-2 border-main rounded-xl text-main barlow text-base font-normal"
-                  color={"#ffffff"}
-                  onClick={() => {
-                    setField("");
-                  }}
-                >
-                  Candel
-                </button>
-              )}
               <button
                 type="submit"
-                className="bg-main rounded-xl text-white barlow font-normal text-lg px-8 py-2"
+                className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"
                 disabled={isLoading}
                 color={"#ffffff"}
-                onClick={() => {
-                  // console.log(field);
-                  // if (field === "add") {
-                  //   if (
-                  //     !fieldsData.name ||
-                  //     !fieldsData.dataType ||
-                  //     fieldsData.required === "" ||
-                  //     fieldsData.unique === ""
-                  //   )
-                  //     return toast.error("Select all fields");
-                  //   if (mode === "create") {
-                  //     collectionData.fields.push(fieldsData);
-                  //     setField("add more");
-                  //   } else {
-                  //     let newArr = collectionData.fields.filter(
-                  //       (item) => item._id !== fieldsData._id
-                  //     );
-                  //     newArr.push(fieldsData);
-                  //     collectionData.fields = [...newArr];
-                  //     setField("");
-                  //   }
-                  //   setFieldsData(defaultField);
-                  // } else {
-                  //   createCollection();
-                  // }
-                }}
               >
                 {isLoading ? (
                   <span className="text-white flex items-center justify-center">
                     <ClipLoader size={20} color="#fff" />
                   </span>
-                ) : field === "add" ? (
-                  mode == "create" ? (
-                    "Add"
-                  ) : (
-                    "Edit"
-                  )
+                ) : mode === "create" ? (
+                  "Create"
                 ) : (
-                  "Create collection"
+                  "Edit"
                 )}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </ModalContainer>
       <ModalContainer
@@ -366,9 +303,7 @@ const Document = () => {
           </p>
           <div className="flex justify-center gap-8 mt-4">
             <button
-              type="submit"
               className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"
-              disabled={isLoading}
               color={"#ffffff"}
               onClick={() => {
                 toggleDeleteModal();
@@ -377,15 +312,16 @@ const Document = () => {
               No
             </button>
             <button
-              type="reset"
               className="h-10 w-24 border-2 border-main rounded-xl text-main barlow text-base font-normal"
               color={"#ffffff"}
-              onClick={() => {
-                toggleDeleteModal();
-                toggleSuccessModal();
-              }}
+              onClick={() => deleteDocument()}
+              disabled={isLoading}
             >
-              Yes
+              {isLoading ? (
+                <span className="text-white flex items-center justify-center">
+                  <ClipLoader size={20} color="#00f" />
+                </span>
+              ) : "Yes"}
             </button>
           </div>
         </div>
@@ -409,3 +345,72 @@ const Document = () => {
 };
 
 export default Document;
+
+const SchemaInputs = ({ type, options, style, label, ...restProps }) => {
+  return (
+    <div>
+      {type === "text" ? (
+        <div className="flex items-center gap-4">
+          <label className="font-semibold whitespace-nowrap">{label}:</label>
+          <input
+            type="text"
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          />
+        </div>
+      ) : type === "numeric value" ? (
+        <div className="flex items-center gap-4">
+          <label className="font-semibold whitespace-nowrap">{label}:</label>
+          <input
+            type="number"
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          />
+        </div>
+      ) : type === "image" ? (
+        <div className="flex items-center gap-4">
+          <label className="font-semibold whitespace-nowrap">{label}:</label>
+          <input
+            type="file"
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          />
+        </div>
+      ) : type === "video" ? (
+        <div className="flex items-center gap-4">
+          <label className="font-semibold whitespace-nowrap">{label}:</label>
+          <input
+            type="file"
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          />
+        </div>
+      ) : type === "document" ? (
+        <div className="flex items-center gap-4">
+          <label className="font-semibold whitespace-nowrap">{label}:</label>
+          <input
+            type="file"
+            className="h-10 border-2 rounded-md px-4 w-full"
+            {...restProps}
+          />
+        </div>
+      ) : (
+        type === "link to another document" && (
+          <div className={`flex items-center gap-4 ${style}`}>
+            <label className="font-semibold whitespace-nowrap">{label}:</label>
+            <select
+              name=""
+              className="h-10 border-2 rounded-md px-4 w-full"
+              {...restProps}
+            >
+              <option value="">--select--</option>
+              {options.map((option) => (
+                <option value={option.toLowerCase()}>{option}</option>
+              ))}
+            </select>
+          </div>
+        )
+      )}
+    </div>
+  );
+};

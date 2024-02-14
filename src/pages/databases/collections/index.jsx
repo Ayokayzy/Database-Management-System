@@ -344,7 +344,7 @@ const Collections = () => {
             ) : (
               <div className="m max-h-96 overflow-y-auto scrollbar-hide">
                 <p className="text-xl">
-                  <b>Name: Students</b>
+                  <b>Name: {collectionData.name}</b>
                 </p>
                 <p className="text-lg font-medium">Fields</p>
                 {collectionData?.fields?.map((data) => (

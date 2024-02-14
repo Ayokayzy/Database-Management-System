@@ -17,7 +17,7 @@ const InviteSuccess = () => {
         {user ? (
           <img
             src={require("../../assets/success-icon.png")}
-            className=""
+            className="mx-auto"
             alt=""
           />
         ) : (
