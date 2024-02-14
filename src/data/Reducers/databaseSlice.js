@@ -4,7 +4,7 @@ import axios from "axios";
 const initialState = {
   databases: [],
   currentDatabase: "",
-  verify: false,
+  verifyUser: false,
   verifyMsg: "",
 };
 
@@ -19,7 +19,7 @@ export const databaseSlice = createSlice({
       state.currentDatabase = payload;
     },
     verifyUser: (state, { payload }) => {
-      state.verify(payload);
+      state.verifyUser(payload);
     },
     setVerifyMsg: (state, { payload }) => {
       state.verifyMsg = payload;

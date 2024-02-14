@@ -4,6 +4,7 @@ import axios from "axios";
 const initialState = {
   dbCollections: [],
   currentCollectionDetails: {},
+  currentCollection: ""
 };
 
 const CollectionSlice = createSlice({
@@ -16,10 +17,13 @@ const CollectionSlice = createSlice({
     setCurrentCollectionDetails: (state, { payload }) => {
       state.currentCollectionDetails = payload;
     },
+    setCurrentColletion: (state, {payload}) => {
+      state.currentCollection = payload
+    }
   },
 });
 
-export const { setCollections, setCurrentCollectionDetails } =
+export const { setCollections, setCurrentCollectionDetails, setCurrentColletion } =
   CollectionSlice.actions;
 
 export default CollectionSlice.reducer;

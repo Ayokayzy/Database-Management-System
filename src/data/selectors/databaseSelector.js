@@ -18,5 +18,5 @@ export const selectVerifyMsg = createSelector(
 
 export const selectVerifyUser = createSelector(
   [selectDatabase],
-  (verify) => verify.verify
+  (verify) => verify.verifyUser
 )

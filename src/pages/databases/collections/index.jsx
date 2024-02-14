@@ -16,6 +16,7 @@ import axios from "axios";
 import {
   fetchAllCollections,
   fetchCollectionDetails,
+  setCurrentColletion,
 } from "../../../data/Reducers/collectionSlice";
 import {
   selectCollection,
@@ -120,7 +121,7 @@ const Collections = () => {
       closeField();
       toast.success(res.data.message);
       toggleSuccessModal();
-      toggleCreateModal()
+      toggleCreateModal();
     } catch (err) {
       console.log(err);
       setIsLoading(false);
@@ -150,7 +151,10 @@ const Collections = () => {
       <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
         {collection?.map((data) => (
           <DatabaseCard
-            handleClick={() => navigate("/databases/collections/id")}
+            handleClick={() => {
+              dispatch(setCurrentColletion(data._id))
+              navigate("/databases/collections/documents");
+            }}
           >
             <div className="p-8">
               <div className="flex items-center gap-8 ml-4 mb-12">
@@ -169,7 +173,7 @@ const Collections = () => {
                         name: data?.name,
                         fields: data?.fields,
                         database: data?.database,
-                        _id: data._id
+                        _id: data._id,
                       });
                       console.log({ collectionData });
                       toggleCreateModal("edit");
@@ -499,7 +503,13 @@ const Collections = () => {
 
 export default Collections;
 
-export const EditInput = ({ type, label, options = [], style, ...restProps }) => {
+export const EditInput = ({
+  type,
+  label,
+  options = [],
+  style,
+  ...restProps
+}) => {
   return (
     <div>
       {type === "select" ? (
