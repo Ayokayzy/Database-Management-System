@@ -5,10 +5,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { setVerifyMsg, verifyUser } from "../../data/Reducers/databaseSlice";
 
 const VerifyToken = () => {
+  console.log('Verify page');
   const { id } = useParams();
+  console.log(id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(id);
   useEffect(() => {
     const handleVerifyUser = async () => {
       try {
