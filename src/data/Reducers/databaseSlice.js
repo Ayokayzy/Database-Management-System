@@ -5,7 +5,7 @@ const initialState = {
   databases: [],
   currentDatabase: "",
   verify: false,
-  verifyMsg: ""
+  verifyMsg: "",
 };
 
 export const databaseSlice = createSlice({
@@ -18,16 +18,17 @@ export const databaseSlice = createSlice({
     setCurrentDatabase: (state, { payload }) => {
       state.currentDatabase = payload;
     },
-    verifyUser: (state, {payload}) => {
-      state.verify(payload)
+    verifyUser: (state, { payload }) => {
+      state.verify(payload);
     },
-    setVerifyMsg: (state, {payload}) => {
-      state.verifyMsg = payload
-    }
+    setVerifyMsg: (state, { payload }) => {
+      state.verifyMsg = payload;
+    },
   },
 });
 
-export const { setDatabase, setCurrentDatabase, verifyUser, setVerifyMsg } = databaseSlice.actions;
+export const { setDatabase, setCurrentDatabase, verifyUser, setVerifyMsg } =
+  databaseSlice.actions;
 export default databaseSlice.reducer;
 
 export const getAllDatabase = () => async (dispatch) => {
@@ -49,4 +50,3 @@ export const getUserDatabase = () => async (dispatch) => {
     console.log(err.response?.data?.message, { err });
   }
 };
-
