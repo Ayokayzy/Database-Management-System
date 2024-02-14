@@ -499,11 +499,11 @@ const Collections = () => {
 
 export default Collections;
 
-const EditInput = ({ type, label, options = [], ...restProps }) => {
+export const EditInput = ({ type, label, options = [], style, ...restProps }) => {
   return (
     <div>
       {type === "select" ? (
-        <div className="flex items-center gap-4">
+        <div className={`flex items-center gap-4 ${style}`}>
           <label className="font-semibold whitespace-nowrap">{label}:</label>
           <select
             name=""

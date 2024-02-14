@@ -11,8 +11,13 @@ import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllDatabase, setCurrentDatabase, setDatabase } from "../../data/Reducers/databaseSlice";
+import {
+  getAllDatabase,
+  setCurrentDatabase,
+  setDatabase,
+} from "../../data/Reducers/databaseSlice";
 import { selectDatabaseItems } from "../../data/selectors/databaseSelector";
+import { EditInput } from "./collections";
 
 const Databases = () => {
   const navigate = useNavigate();
@@ -36,6 +41,16 @@ const Databases = () => {
     toggleSuccessModal = () => {
       setSuccessModal(!successModal);
     };
+  const defaultInvite = {
+    email: "",
+    privilege: "",
+    _id: "",
+  };
+  const [inviteData, setInviteData] = useState(defaultInvite);
+  const handleInvite = (e) => {
+    const { name, value } = e.target;
+    setInviteData({ ...inviteData, [name]: value });
+  };
   const dispatch = useDispatch();
   const [dbName, setDbName] = useState("");
   const database = useSelector(selectDatabaseItems);
@@ -88,6 +103,25 @@ const Databases = () => {
     }
   };
 
+  const inviteUser = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    console.log(inviteData);
+    if (!inviteData.email || !inviteData.privilege)
+      return toast.error("Fill all fields");
+    try {
+      const res = await axios.post(`/database/user`, inviteData);
+      dispatch(getAllDatabase());
+      setIsLoading(false);
+      // toggleSuccessModal();
+      toast.success(res.data?.message);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+
   return (
     <div className="m-4 min-h-screen bg-white p-8">
       <div className="flex justify-between">
@@ -111,7 +145,7 @@ const Databases = () => {
         {database?.map((item) => (
           <DatabaseCard
             handleClick={() => {
-              dispatch(setCurrentDatabase(item._id))
+              dispatch(setCurrentDatabase(item._id));
               navigate("/databases/collections");
             }}
           >
@@ -128,7 +162,10 @@ const Databases = () => {
                 <div className="flex justify-between items-center">
                   <button
                     className="border rounded p-2 font-light"
-                    onClick={toggleInviteModal}
+                    onClick={() => {
+                      setInviteData({ ...inviteData, _id: item._id });
+                      toggleInviteModal();
+                    }}
                   >
                     Invite users
                   </button>
@@ -172,13 +209,25 @@ const Databases = () => {
               addresses
             </p>
           </div>
-          <div>
-            <Input
-              type={"text"}
-              label={"Email address"}
-              value={dbName}
-              onChange={(e) => setDbName(e.target.value)}
-            />
+          <form onSubmit={inviteUser}>
+            <div className="space-y-4 mt-8">
+              <EditInput
+                type={"text"}
+                label={"Email address"}
+                value={inviteData.email}
+                onChange={handleInvite}
+                name="email"
+              />
+              <EditInput
+                label={"privilege"}
+                type={"select"}
+                onChange={handleInvite}
+                value={inviteData.privilege}
+                options={["Edit-structure", "view", "Edit-content"]}
+                name="privilege"
+              />
+            </div>
+
             <div className="flex justify-center gap-8 mt-8">
               {/* <button
                 type="reset"
@@ -193,21 +242,17 @@ const Databases = () => {
                 className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"
                 disabled={isLoading}
                 color={"#ffffff"}
-                onClick={() => {
-                  toggleCreateModal();
-                  toggleSuccessModal();
-                }}
               >
                 {isLoading ? (
                   <span className="text-white flex items-center justify-center">
-                    Update <ClipLoader size={20} color="#fff" />
+                    <ClipLoader size={20} color="#fff" />
                   </span>
                 ) : (
                   "Invite"
                 )}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </ModalContainer>
       <ModalContainer show={createModal} close={toggleCreateModal}>

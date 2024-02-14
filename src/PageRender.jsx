@@ -21,14 +21,6 @@ const PageRender = () => {
     navigate = useNavigate();
 
   useEffect(() => {
-    if (!auth?.isAuth) {
-      // if (!error?.errorText) {
-      if (page !== "login" && page !== "register") {
-        navigate("/");
-      }
-      // clearErrors();
-      // }
-    }
     if (auth.isAdmin) {
       if (["database"].includes(page)) {
         return navigate("/");
