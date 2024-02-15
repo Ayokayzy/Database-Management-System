@@ -30,6 +30,12 @@ const defaultField = {
   dataType: "",
 };
 
+export const cannotBeUnique = (dataType) => {
+  return ["image", "video", "document", "link to another file"].includes(
+    dataType
+  );
+};
+
 const Collections = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState("create");

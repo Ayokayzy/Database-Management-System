@@ -18,7 +18,7 @@ import Input from "../../../../components/input/input";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { EditInput } from "..";
+import { EditInput, cannotBeUnique } from "..";
 import { fetchAllDocuments } from "../../../../data/Reducers/documentsSlice";
 import { selectAllDocuments } from "../../../../data/selectors/documentSelector";
 
@@ -50,13 +50,20 @@ const Document = () => {
       setSuccessModal(!successModal);
     };
   const handleField = (e) => {
-    const { name, value } = e.target;
-    setFieldsData({ ...fieldsData, [name]: value });
+    console.log(e);
+    const { name, value, files } = e.target;
+    if (e.target.type === "file") {
+      setFieldsData({ ...fieldsData, [name]: files[0] });
+    } else {
+      setFieldsData({ ...fieldsData, [name]: value });
+    }
   };
 
   const closeCreateModal = () => {
     setCreateModal(false);
   };
+
+  const formData = new FormData();
 
   const createDocument = async (e) => {
     e.preventDefault();
@@ -72,6 +79,9 @@ const Document = () => {
     if (flag > 0) {
       return toast.error("All fields are required");
     }
+    Object.keys(fieldsData).forEach((data) =>
+      formData.append(data, fieldsData.data)
+    );
     const data = {
       collectionId,
       database: databaseId,
@@ -81,6 +91,7 @@ const Document = () => {
       ...fieldsData,
       _id: editData._id,
     };
+    Object.keys(data).forEach((dat) => formData.append(dat, fieldsData.dat));
     console.log(data);
     console.log(mode);
     console.log(myEditData);
@@ -158,6 +169,7 @@ const Document = () => {
 
   useEffect(() => {
     dispatch(fetchAllDocuments(databaseId, collectionId));
+    dispatch(fetchCollectionDetails(collectionId, databaseId));
   }, []);
   return (
     <div className="m-4 min-h-screen bg-white p-8">
@@ -246,15 +258,25 @@ const Document = () => {
             </h3>
           </div>
           <form className="my-8 space-y-4" onSubmit={createDocument}>
-            {collectionSchema?.fields?.map((field) => (
-              <SchemaInputs
-                type={field.dataType}
-                label={field.name}
-                name={field.name}
-                value={fieldsData[field.name]}
-                onChange={handleField}
-              />
-            ))}
+            {collectionSchema?.fields?.map((field) =>
+              cannotBeUnique(field.datatype) ? (
+                <SchemaInputs
+                  type={field.dataType}
+                  label={field.name}
+                  name={field.name}
+                  value={fieldsData[field.name]}
+                  onChange={handleField}
+                />
+              ) : (
+                <SchemaInputs
+                  type={field.dataType}
+                  label={field.name}
+                  name={field.name}
+                  // value={fieldsData[field.name]}
+                  onChange={handleField}
+                />
+              )
+            )}
             <div className="flex justify-center gap-8 mt-8">
               <button
                 type="reset"
@@ -321,7 +343,9 @@ const Document = () => {
                 <span className="text-white flex items-center justify-center">
                   <ClipLoader size={20} color="#00f" />
                 </span>
-              ) : "Yes"}
+              ) : (
+                "Yes"
+              )}
             </button>
           </div>
         </div>

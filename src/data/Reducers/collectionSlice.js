@@ -41,6 +41,7 @@ export const fetchAllCollections = (dbId) => async (dispatch) => {
 export const fetchCollectionDetails = (colId, dbId) => async (dispatch) => {
   try {
     const res = await axios.get(`/collection/details/${colId}/${dbId}`);
+    console.log(res);
     dispatch(setCurrentCollectionDetails(res.data.data));
   } catch (err) {
     console.log(err);
