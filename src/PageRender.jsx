@@ -22,13 +22,13 @@ const PageRender = () => {
 
   useEffect(() => {
     if (auth.isAdmin) {
-      if (["database"].includes(page)) {
-        return navigate("/");
+      if (["database", "/"].includes(page)) {
+        return navigate("/dashboard");
       }
     }
     if (!auth.isAdmin) {
       if (["dashboard", "all-users"].includes(page)) {
-        return navigate("/databases")
+        return navigate("/databases");
       }
     }
     if (auth?.isAuth) {

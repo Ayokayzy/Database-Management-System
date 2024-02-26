@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { ReuseBox } from "./register";
 import forgotBg from "../assets/forgot-password-bg.png";
 import forgotHero from "../assets/forgot-hero.png";
@@ -7,18 +7,58 @@ import Button from "../components/button/button";
 import ModalContainer, {
   OtpComponent,
 } from "../components/modal-container/modal-container";
+import { GlobalState } from "../data/Context";
+import { toast } from "react-toastify";
+import axios from 'axios'
 
 const ResetPassword = () => {
   const [modal, setModal] = useState(false),
     [mode, setMode] = useState("otp"),
+    [code, setCode] = useState(""),
     [successModal, setSuccessModal] = useState(false);
+  const [email, setEmail] = useState("");
+  const { resendToken } = useContext(GlobalState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleModal = () => {
     setModal(!modal);
   };
 
+  const sendResetToken = async () => {
+    if (!email) return toast.error("Provide an email");
+    setIsLoading(true);
+    try {
+      const res = await resendToken("resetPassword", email);
+      setIsLoading(false);
+      toggleModal();
+      return toast.success(res.data.message);
+    } catch (err) {
+      toast.error(err.response.message);
+      setIsLoading(false);
+    }
+  };
+
   const toggleSucces = () => {
     setSuccessModal(!successModal);
+  };
+
+  const verifyEmail = async () => {
+    if (!code) return;
+    setIsLoading(true);
+    try {
+      const res = await axios.post("/auth/verify-Email", {
+        email: email,
+        token: code,
+      });
+      setIsLoading(false);
+      toggleModal();
+      setMode("newPassword");
+      return toast.success(res.data?.message);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
   };
   return (
     <div>
@@ -40,12 +80,15 @@ const ResetPassword = () => {
               type={"email"}
               label={"Email Address"}
               placeholder={"Enter your mail address"}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <div className="flex justify-center mt-8">
               <Button
-                handleButton={toggleModal}
+                handleButton={sendResetToken}
                 text={"Continue to reset"}
                 style={"w-full"}
+                loading={isLoading}
               />
             </div>
           </div>
@@ -74,7 +117,15 @@ const ResetPassword = () => {
             />
             <div className="flex flex-col gap-2 items-center justify-center">
               <p>Type in below</p>
-              <OtpComponent />
+              <OtpComponent
+                stateData={code}
+                textChange={(data) => {
+                  setCode(data);
+                }}
+                css="borderColor"
+                loading={isLoading}
+                numInputs={6}
+              />
             </div>
             <div className="mt-4 text-center">
               Didn’t get the code?{" "}
@@ -82,9 +133,10 @@ const ResetPassword = () => {
             </div>
             <div className="flex justify-center my-12">
               <Button
-                handleButton={() => setMode("newPassword")}
+                handleButton={verifyEmail}
                 text={"Continue"}
                 style={"w-full"}
+                loading={isLoading}
               />
             </div>
           </div>

@@ -1,6 +1,13 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import {
+  selectAllusers,
+  selectUsersLoading,
+} from "../../data/selectors/adminSelector";
 
 const AllUsers = () => {
+  const users = useSelector(selectAllusers);
+  const usersLoading = useSelector(selectUsersLoading);
   return (
     <div className="p-4">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
@@ -10,9 +17,9 @@ const AllUsers = () => {
               <th scope="col" className="px-6 py-3">
                 mame
               </th>
-              <th scope="col" className="px-6 py-3">
+              {/* <th scope="col" className="px-6 py-3">
                 gender
-              </th>
+              </th> */}
               <th scope="col" className="px-6 py-3">
                 Documents
               </th>
@@ -34,30 +41,30 @@ const AllUsers = () => {
             </tr>
           </thead>
           <tbody className="text-lg font-light">
-            <tr className="bg-white border-b shadow-lg">
-              <td className="px-6 py-4">John Doe</td>
-              <td className="px-6 py-4">Male</td>
-              <td className="px-6 py-4">20</td>
-              <td className="px-6 py-4">20</td>
-              <td className="px-6 py-4">20</td>
-              <td className="px-6 py-4">johndoe@gmail.com</td>
-              <td className="px-6 py-4">+234 810 111 2222</td>
-              <td className="px-6 py-4">
-                <span className="te text-red-500">Block User</span>
-              </td>
-            </tr>
-            <tr className="bg-white border-b shadow-lg">
-              <td className="px-6 py-4">John Doe</td>
-              <td className="px-6 py-4">Male</td>
-              <td className="px-6 py-4">20</td>
-              <td className="px-6 py-4">20</td>
-              <td className="px-6 py-4">20</td>
-              <td className="px-6 py-4">johndoe@gmail.com</td>
-              <td className="px-6 py-4">+234 810 111 2222</td>
-              <td className="px-6 py-4">
-                <span className="te text-red-500">Block User</span>
-              </td>
-            </tr>
+            {users?.users
+              ?.filter((user) => user.admin === false)
+              .map((user) => (
+                <tr className="bg-white border-b shadow-lg whitespace-nowrap">
+                  <td className="px-6 py-4">
+                    {user.firstname + " " + user.lastname}
+                  </td>
+                  {/* <td className="px-6 py-4">Male</td> */}
+                  <td className="px-6 py-4">20</td>
+                  <td className="px-6 py-4">20</td>
+                  <td className="px-6 py-4">20</td>
+                  <td className="px-6 py-4">{user.email}</td>
+                  <td className="px-6 py-4">{user.phone}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`${
+                        user.deactivated ? "text-green-400" : "text-red-500"
+                      }`}
+                    >
+                      {user.deactivated ? "Activate User" : "Block User"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

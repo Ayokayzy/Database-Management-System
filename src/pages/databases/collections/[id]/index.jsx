@@ -53,7 +53,7 @@ const Document = () => {
     console.log(e);
     const { name, value, files } = e.target;
     if (e.target.type === "file") {
-      setFieldsData({ ...fieldsData, [name]: files[0] });
+      setFieldsData({ ...fieldsData, [name]: files });
     } else {
       setFieldsData({ ...fieldsData, [name]: value });
     }

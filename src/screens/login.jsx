@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { ReuseBox } from "./register";
 import loginBg from "../assets/login-bg.png";
 import loginHero from "../assets/login-hero.png";
@@ -13,6 +13,7 @@ import axios from "axios";
 import ModalContainer, {
   OtpComponent,
 } from "../components/modal-container/modal-container";
+import { GlobalState } from "../data/Context";
 
 const defaultData = {
   email: "",
@@ -66,7 +67,7 @@ const Login = () => {
       console.log(err);
       setIsLoading(false);
       if (err.response?.status === 402) {
-        resendToken();
+        await resendToken("verifyEmail", formData.email);
         toggleModal();
         return;
       }
@@ -94,11 +95,11 @@ const Login = () => {
     }
   };
 
-  const resendToken = async () => {
+  const resendToken = async (type, email) => {
     try {
       const res = await axios.post("/auth/request-resend-password", {
-        email: formData.email,
-        type: "verifyEmail",
+        email: email,
+        type: type,
       });
       setIsLoading(false);
       return toast.success(res.data?.message);
@@ -189,7 +190,12 @@ const Login = () => {
           </div>
           <div className="mt-4 text-center">
             Didn’t get the code?{" "}
-            <span className="font-bold cursor-pointer">Resend code</span>
+            <span
+              className="font-bold cursor-pointer"
+              onClick={() => resendToken("verifyEmail", formData.email)}
+            >
+              Resend code
+            </span>
           </div>
           <div className="flex justify-center my-12">
             <Button

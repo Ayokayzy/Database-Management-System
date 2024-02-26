@@ -6,6 +6,7 @@ import { TfiSettings } from "react-icons/tfi";
 import { GoDatabase } from "react-icons/go";
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import axios from "axios";
 
 export const GlobalState = createContext();
 
@@ -38,7 +39,7 @@ const DataProvider = ({ children }) => {
     {
       name: "Dashboard",
       url: "/dashboard",
-      icon: <LiaHomeSolid  size={24} />,
+      icon: <LiaHomeSolid size={24} />,
       permission: ["admin"],
     },
     {
@@ -61,6 +62,14 @@ const DataProvider = ({ children }) => {
     },
   ];
 
+  const resendToken = async (type, email) => {
+    const res = await axios.post("/auth/request-resend-password", {
+      email: email,
+      type: type,
+    });
+    return res;
+  };
+
   const state = {
     handleCapitalize,
 
@@ -70,6 +79,7 @@ const DataProvider = ({ children }) => {
     auth,
     nav,
     toggleNav,
+    resendToken,
   };
 
   return <GlobalState.Provider value={state}>{children}</GlobalState.Provider>;
