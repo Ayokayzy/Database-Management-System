@@ -10,8 +10,8 @@ export const SetAuthToken = (token) => {
   }
 };
 
-// export const useURL = process.env.REACT_APP_BASE_URL;
-export const useURL = "http://localhost:8080/v1";
+export const useURL = process.env.REACT_APP_BASE_URL;
+// export const useURL = "http://localhost:8080/v1";
 // export const useURL =
 // 	process.env.NODE_ENV === "development"
 // 		? "http://localhost:6905"

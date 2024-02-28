@@ -25,7 +25,7 @@ const Profile = () => {
         type="button"
         onClick={toggleProfile}
       >
-          <div className="hidden md:block text-xl text-[#4F4F4F]">Mercy</div>
+          <div className="hidden md:block text-xl text-[#4F4F4F]">{auth?.user?.firstname}</div>
         <Profilerounded sm img={auth?.user?.avatar?.url} />
       </button>
 
