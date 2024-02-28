@@ -7,6 +7,7 @@ import {
 
 const AllUsers = () => {
   const users = useSelector(selectAllusers);
+  console.log({ users });
   const usersLoading = useSelector(selectUsersLoading);
   return (
     <div className="p-4">
@@ -49,9 +50,9 @@ const AllUsers = () => {
                     {user.firstname + " " + user.lastname}
                   </td>
                   {/* <td className="px-6 py-4">Male</td> */}
-                  <td className="px-6 py-4">20</td>
-                  <td className="px-6 py-4">20</td>
-                  <td className="px-6 py-4">20</td>
+                  <td className="px-6 py-4">{user.noOfDocuments}</td>
+                  <td className="px-6 py-4">{user.noOfDBs}</td>
+                  <td className="px-6 py-4">{user.noOfCollections}</td>
                   <td className="px-6 py-4">{user.email}</td>
                   <td className="px-6 py-4">{user.phone}</td>
                   <td className="px-6 py-4">

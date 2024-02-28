@@ -231,49 +231,46 @@ export const PasswordBox = () => {
 };
 
 export const UpdateProfilePicture = () => {
-  let { user } = useSelector((state) => state),
-    [logo, setLogo] = useState(false),
+  let user = useSelector(selectCurrentUser),
+    [logo, setLogo] = useState(""),
     [state, setState] = useState(user?.user),
     [loading, setLoading] = useState(false),
-    dispatch = useDispatch(),
-    handleNext = async (e) => {
-      e?.preventDefault();
-      if (!logo) return toast.error("Upload a valid image");
-      setLoading(true);
-      try {
-        let res = await axios.post("/user/upload", { image });
-        console.log(res);
-        setLoading(false);
-        toast.success(res.data?.message);
-      } catch (err) {
-        console.log(err);
-        setLoading(false);
-        return toast.error(err.response?.data?.message);
-      }
-    };
+    dispatch = useDispatch();
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (user?.user) setState(user?.user);
   }, [user?.user]);
 
-  const image = new FormData();
   let handleChangeImage = (e) => {
     const file = e.target.files[0];
-    let err = "";
-
-    if (!file) return (err = `File, ${file?.name} does not exist`);
-    if (!file.type.includes("image"))
-      return (err = `File, ${file?.name} format not supported`);
-
-    if (err) {
-      return toast.error(err);
-    } else {
-      setLogo(file);
-      image.append("image", file);
-    }
+    setLogo(file);
   };
 
+  const handleNext = async (e) => {
+    e?.preventDefault();
+    if (!logo) return toast.error("Upload a valid image");
+    const image = new FormData();
+    image.append("image", logo);
+    setLoading(true);
+    try {
+      let res = await axios.post("/user/upload", image, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(res);
+      setLoading(false);
+      dispatch(loadUser());
+      toast.success(res.data?.message);
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+  console.log(user);
   return (
     <div>
       <div className="flex flex-col items-center gap-4 mt-8 relative">
@@ -281,7 +278,7 @@ export const UpdateProfilePicture = () => {
           src={
             logo
               ? URL.createObjectURL(logo)
-              : user?.user?.avatar?.url || require("../../assets/pp-2.png")
+              : user?.avatar?.url || require("../../assets/pp-2.png")
           }
           alt=""
           className="h-36 w-36 rounded-full border"
