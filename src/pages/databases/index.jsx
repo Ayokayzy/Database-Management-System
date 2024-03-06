@@ -16,8 +16,12 @@ import {
   setCurrentDatabase,
   setDatabase,
 } from "../../data/Reducers/databaseSlice";
-import { selectDatabaseItems } from "../../data/selectors/databaseSelector";
+import {
+  selectDatabaseItems,
+  selectDbLoading,
+} from "../../data/selectors/databaseSelector";
 import { EditInput } from "./collections";
+import Loader from "../../components/loader/loader";
 
 const Databases = () => {
   const navigate = useNavigate();
@@ -54,6 +58,7 @@ const Databases = () => {
   const dispatch = useDispatch();
   const [dbName, setDbName] = useState("");
   const database = useSelector(selectDatabaseItems);
+  const dbLoading = useSelector(selectDbLoading);
   console.log({ database });
 
   const createDatabase = async () => {
@@ -141,12 +146,22 @@ const Databases = () => {
           create database
         </button>
       </div>
+      {dbLoading && (
+        <div className="flex items-center justify-center h-screen max-h-screen">
+          <Loader />
+        </div>
+      )}
+      {!database && (
+        <div className="flex items-center justify-center h-screen max-h-screen">
+          <p>Empty</p>
+        </div>
+      )}
       <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
         {database?.map((item) => (
           <DatabaseCard
             handleClick={() => {
               dispatch(setCurrentDatabase(item._id));
-              navigate("/databases/collections");
+              navigate("/databases/collections", { state: { dbId: item._id } });
             }}
           >
             <div className="p-8">
@@ -155,8 +170,12 @@ const Databases = () => {
                 <p className="font-medium text-lg">{item.name}</p>
               </div>
               <div className="my-4 space-y-2">
-                <p className="font-semibold text-lg">Collections: 10</p>
-                <p className="font-semibold text-lg">Documents: 5</p>
+                <p className="font-semibold text-lg">
+                  Collections: {item.collections}
+                </p>
+                <p className="font-semibold text-lg">
+                  Documents: {item.documents}
+                </p>
               </div>
               <div className="relative h-8 z-50">
                 <div className="flex justify-between items-center">
@@ -229,14 +248,6 @@ const Databases = () => {
             </div>
 
             <div className="flex justify-center gap-8 mt-8">
-              {/* <button
-                type="reset"
-                className="h-8 w-24 border-2 border-main rounded-xl text-main barlow text-base font-normal"
-                color={"#ffffff"}
-                onClick={toggleInviteModal}
-              >
-                Cancel
-              </button> */}
               <button
                 type="submit"
                 className="h-10 w-24 bg-main rounded-xl text-white barlow font-normal text-lg"

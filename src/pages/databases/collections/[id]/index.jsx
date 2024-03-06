@@ -5,7 +5,7 @@ import DatabaseCard from "../../../../components/database-card/database-card";
 
 import { MdOutlineEdit } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCollectionDetails } from "../../../../data/Reducers/collectionSlice";
 import {
@@ -20,17 +20,21 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { EditInput, cannotBeUnique } from "..";
 import { fetchAllDocuments } from "../../../../data/Reducers/documentsSlice";
-import { selectAllDocuments } from "../../../../data/selectors/documentSelector";
+import {
+  selectAllDocuments,
+  selectDocumentLoading,
+} from "../../../../data/selectors/documentSelector";
+import Loader from "../../../../components/loader/loader";
 
 const Document = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
-  const collectionId = useSelector(selectCurrentCollection);
-  const databaseId = useSelector(selectCurrentDatabAse);
+  const { dbId, colId } = location.state;
   const documents = useSelector(selectAllDocuments);
   const collectionSchema = useSelector(selectCollectionDetails);
-  console.log(collectionSchema);
-  console.log(documents);
+  const documentLoading = useSelector(selectDocumentLoading);
+  // console.log({ colId, dbId });
 
   const [mode, setMode] = useState("create");
   const [fieldsData, setFieldsData] = useState({});
@@ -50,10 +54,9 @@ const Document = () => {
       setSuccessModal(!successModal);
     };
   const handleField = (e) => {
-    console.log(e);
     const { name, value, files } = e.target;
     if (e.target.type === "file") {
-      setFieldsData({ ...fieldsData, [name]: files });
+      setFieldsData({ ...fieldsData, [name]: files[0] });
     } else {
       setFieldsData({ ...fieldsData, [name]: value });
     }
@@ -79,19 +82,19 @@ const Document = () => {
     if (flag > 0) {
       return toast.error("All fields are required");
     }
-    Object.keys(fieldsData).forEach((data) =>
-      formData.append(data, fieldsData.data)
-    );
+    // Object.keys(fieldsData).forEach((data) =>
+    //   formData.append(data, fieldsData[data])
+    // );
     const data = {
-      collectionId,
-      database: databaseId,
+      collectionId: colId,
+      database: dbId,
       ...fieldsData,
     };
     const myEditData = {
       ...fieldsData,
       _id: editData._id,
     };
-    Object.keys(data).forEach((dat) => formData.append(dat, fieldsData.dat));
+    Object.keys(data).forEach((dat) => formData.append(dat, data[dat]));
     console.log(data);
     console.log(mode);
     console.log(myEditData);
@@ -99,12 +102,12 @@ const Document = () => {
     try {
       let res;
       if (mode === "create") {
-        res = await axios.post("/document", data);
+        res = await axios.post("/document", formData);
       } else {
         res = await axios.put("/document", myEditData);
       }
       console.log(res);
-      dispatch(fetchAllDocuments(databaseId, collectionId));
+      dispatch(fetchAllDocuments({ colId, dbId }));
       setIsLoading(false);
       toggleCreateModal();
       // toggleSuccessModal();
@@ -155,7 +158,7 @@ const Document = () => {
     setIsLoading(true);
     try {
       const res = await axios.delete(`/document/${editData._id}`);
-      dispatch(fetchAllDocuments(databaseId, collectionId));
+      dispatch(fetchAllDocuments(dbId, colId));
       setIsLoading(false);
       toggleDeleteModal();
       // toggleSuccessModal();
@@ -168,8 +171,8 @@ const Document = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAllDocuments(databaseId, collectionId));
-    dispatch(fetchCollectionDetails(collectionId, databaseId));
+    dispatch(fetchAllDocuments({ colId, dbId }));
+    dispatch(fetchCollectionDetails(colId, dbId));
   }, []);
   return (
     <div className="m-4 min-h-screen bg-white p-8">
@@ -189,67 +192,71 @@ const Document = () => {
           </button>
         </div>
       </div>
-      <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
-        {documents?.map((document) => (
-          <DatabaseCard>
-            <div className="p-6">
-              <div className="my-2 space-y-1">
-                {document.text?.map((file) => (
-                  <p className="text-lg">
-                    {file.name} <b>{file.value}</b>
-                  </p>
-                ))}
-                {/* <p className="text-lg">
-                  Age: <b>23</b>
-                </p>
-                <p className="text-lg">
-                  Education: <b>Lautech</b>
-                </p>
-                <p className="text-lg">
-                  Picture:{" "}
-                  <span>
-                    <button className="border-2 rounded p-2 font-medium text-sm">
-                      View
-                    </button>{" "}
-                    <button className="border-2 rounded p-2 font-medium text-sm">
-                      Download
-                    </button>{" "}
-                  </span>
-                </p>
-                <p className="text-lg">
-                  <span>
-                    CV:{" "}
-                    <button className="border-2 rounded p-2 font-medium text-sm">
-                      Download
-                    </button>
-                  </span>
-                </p> */}
-              </div>
-              <div className="relative h-8 z-50">
-                <div className="flex justify-end">
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={() => handleEdit(document)}
-                    >
-                      <MdOutlineEdit />
-                    </button>
-                    <button
-                      className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                      onClick={() => {
-                        setEditData(document);
-                        toggleDeleteModal();
-                      }}
-                    >
-                      <RiDeleteBin5Line />
-                    </button>
+      {documentLoading ? (
+        <div className="flex items-center justify-center h-screen max-h-screen">
+          <Loader />
+        </div>
+      ) : (
+        <div>
+          {!documents.length && (
+            <div className="flex items-center justify-center h-screen max-h-screen">
+              <p>Empty</p>
+            </div>
+          )}
+          <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
+            {documents?.map((document, idx) => (
+              <DatabaseCard>
+                <div className="p-6">
+                  <div className="my-8 space-y-1">
+                    {document.text?.length > 0 &&
+                      document.text.map((file) => (
+                        <p className="text-lg">
+                          {file.name} <b>{file.value}</b>
+                        </p>
+                      ))}
+                    {document.files?.length > 0 &&
+                      document.files?.map((file) => (
+                        <div className="flex items-center gap-4 my-2 relative z-40">
+                          <p className="text-lg capitalize whitespace-nowrap">
+                            {file.name}:
+                          </p>
+                          <a
+                            href={file.url}
+                            className="p-2 px-4 rounded-md border-2 border-blue-900 text-2xl"
+                            target="__blank"
+                          >
+                            {file.fileType === "image" ? "View" : "Download"}
+                          </a>
+                        </div>
+                      ))}
+                  </div>
+                  <div className="relative h-8 z-50">
+                    <div className="flex justify-end">
+                      <div className="flex items-center gap-2">
+                        <button
+                          className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                          onClick={() => handleEdit(document)}
+                        >
+                          <MdOutlineEdit />
+                        </button>
+                        <button
+                          className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                          onClick={() => {
+                            setEditData(document);
+                            toggleDeleteModal();
+                          }}
+                        >
+                          <RiDeleteBin5Line />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </DatabaseCard>
-        ))}
-      </div>
+              </DatabaseCard>
+            ))}
+          </div>
+        </div>
+      )}
       <ModalContainer show={createModal} close={closeCreateModal}>
         <div>
           <div className="text-center">

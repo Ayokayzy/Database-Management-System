@@ -20,9 +20,11 @@ const PageRender = () => {
   const escape2 = ["collections"],
     navigate = useNavigate();
 
+    console.log({page, auth});
+
   useEffect(() => {
-    if (auth.isAdmin) {
-      if (["database", "/"].includes(page)) {
+    if (auth?.isAdmin) {
+      if (["databases", "/"].includes(page)) {
         return navigate("/dashboard");
       }
     }
@@ -37,7 +39,7 @@ const PageRender = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, auth?.isAuth, navigate]);
+  }, [page, auth?.isAuth, auth?.isAdmin, navigate]);
 
   if (auth.token && auth.loading) return <></>;
   // if (general?.isLoading && users.isLoading) return <Loader />;

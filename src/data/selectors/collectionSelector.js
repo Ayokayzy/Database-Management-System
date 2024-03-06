@@ -15,4 +15,9 @@ export const selectCollectionDetails = createSelector(
 export const selectCurrentCollection = createSelector(
   [collection],
   (current) => current.currentCollection
-)
+);
+
+export const selectCollectionLoading = createSelector(
+  [collection],
+  (loading) => loading.isLoading
+);

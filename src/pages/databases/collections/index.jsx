@@ -4,7 +4,7 @@ import DatabaseCard from "../../../components/database-card/database-card";
 
 import { MdOutlineEdit } from "react-icons/md";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ModalContainer from "../../../components/modal-container/modal-container";
 import Input from "../../../components/input/input";
 import { ClipLoader } from "react-spinners";
@@ -21,7 +21,9 @@ import {
 import {
   selectCollection,
   selectCollectionDetails,
+  selectCollectionLoading,
 } from "../../../data/selectors/collectionSelector";
+import Loader from "../../../components/loader/loader";
 
 const defaultField = {
   name: "",
@@ -38,15 +40,18 @@ export const cannotBeUnique = (dataType) => {
 
 const Collections = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mode, setMode] = useState("create");
   const [field, setField] = useState("");
-  const currentDatabase = useSelector(selectCurrentDatabAse);
+  const { dbId } = location.state;
   const collection = useSelector(selectCollection);
+  const collectionLoading = useSelector(selectCollectionLoading);
   const collectionDetails = useSelector(selectCollectionDetails);
-  console.log(currentDatabase);
+  console.log(dbId);
+  console.log(location);
   const [fieldsData, setFieldsData] = useState(defaultField);
   const defaultCollection = {
-    database: currentDatabase,
+    database: dbId,
     name: "",
     fields: [],
   };
@@ -89,13 +94,15 @@ const Collections = () => {
     setCreateModal(false);
   };
 
+  const [collectionId, setCollectionId] = useState("");
+
   const createCollection = async () => {
     setIsLoading(true);
     console.log(collectionData);
     try {
       const res = await axios.post("/collection", collectionData);
       console.log(res);
-      dispatch(fetchAllCollections(currentDatabase));
+      dispatch(fetchAllCollections(dbId));
       setIsLoading(false);
       closeField();
       toast.success(res.data.message);
@@ -122,7 +129,7 @@ const Collections = () => {
     try {
       const res = await axios.put("/collection", data);
       console.log(res);
-      dispatch(fetchAllCollections(currentDatabase));
+      dispatch(fetchAllCollections(dbId));
       setIsLoading(false);
       closeField();
       toast.success(res.data.message);
@@ -135,8 +142,24 @@ const Collections = () => {
     }
   };
 
+  const deleteCollection = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.delete(`/collection/${collectionId}`);
+      dispatch(fetchAllCollections(dbId));
+      setIsLoading(false);
+      toggleDeleteModal();
+      // toggleSuccessModal();
+      toast.success(res.data?.message);
+    } catch (err) {
+      console.log(err);
+      setIsLoading(false);
+      return toast.error(err.response?.data?.message);
+    }
+  };
+
   useEffect(() => {
-    dispatch(fetchAllCollections(currentDatabase));
+    dispatch(fetchAllCollections(dbId));
   }, []);
   return (
     <div className="m-4 min-h-screen bg-white p-8">
@@ -154,51 +177,73 @@ const Collections = () => {
           create collection
         </button>
       </div>
-      <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
-        {collection?.map((data) => (
-          <DatabaseCard
-            handleClick={() => {
-              dispatch(setCurrentColletion(data._id))
-              navigate("/databases/collections/documents");
-            }}
-          >
-            <div className="p-8">
-              <div className="flex items-center gap-8 ml-4 mb-12">
-                <img src={require(`../../../assets/${"db.png"}`)} alt="" />
-                <p className="font-medium text-lg capitalize">{data.name}</p>
-              </div>
-              {/* <div className="my-4 space-y-2">
-                <p className="font-semibold text-lg">Documents: 5</p>
-              </div> */}
-              <div className="flex justify-end w-fit ml-auto relative z-30">
-                <div className="flex items-center gap-2">
-                  <button
-                    className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                    onClick={() => {
-                      setCollectionData({
-                        name: data?.name,
-                        fields: data?.fields,
-                        database: data?.database,
-                        _id: data._id,
-                      });
-                      console.log({ collectionData });
-                      toggleCreateModal("edit");
-                    }}
-                  >
-                    <MdOutlineEdit />
-                  </button>
-                  <button
-                    className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                    onClick={toggleDeleteModal}
-                  >
-                    <RiDeleteBin5Line />
-                  </button>
-                </div>
-              </div>
+      {collectionLoading ? (
+        <div className="flex items-center justify-center h-screen max-h-screen">
+          <Loader />
+        </div>
+      ) : (
+        <div>
+          {!collection.length && (
+            <div className="flex items-center justify-center h-screen max-h-screen">
+              <p>Empty</p>
             </div>
-          </DatabaseCard>
-        ))}
-      </div>
+          )}
+          <div className="grid mt-8 lg:grid-cols-3 gap-8 md:grid-cols-2">
+            {collection?.map((data) => (
+              <DatabaseCard
+                handleClick={() => {
+                  dispatch(setCurrentColletion(data._id));
+                  navigate("/databases/collections/documents", {
+                    state: { dbId, colId: data._id },
+                  });
+                }}
+              >
+                <div className="p-8">
+                  <div className="flex items-center gap-8 ml-4 mb-12">
+                    <img src={require(`../../../assets/${"db.png"}`)} alt="" />
+                    <p className="font-medium text-lg capitalize">
+                      {data.name}
+                    </p>
+                  </div>
+                  <div className="my-4 space-y-2">
+                    <p className="font-semibold text-lg">
+                      Documents: {data.documents}
+                    </p>
+                  </div>
+                  <div className="flex justify-end w-fit ml-auto relative z-30">
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                        onClick={() => {
+                          setCollectionData({
+                            name: data?.name,
+                            fields: data?.fields,
+                            database: data?.database,
+                            _id: data._id,
+                          });
+                          console.log({ collectionData });
+                          toggleCreateModal("edit");
+                        }}
+                      >
+                        <MdOutlineEdit />
+                      </button>
+                      <button
+                        className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                        onClick={() => {
+                          setCollectionId(data._id);
+                          toggleDeleteModal();
+                        }}
+                      >
+                        <RiDeleteBin5Line />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </DatabaseCard>
+            ))}
+          </div>
+        </div>
+      )}
       <ModalContainer show={createModal} close={closeCreateModal}>
         <div>
           <div className="text-center">
@@ -479,12 +524,18 @@ const Collections = () => {
               type="reset"
               className="h-10 w-24 border-2 border-main rounded-xl text-main barlow text-base font-normal"
               color={"#ffffff"}
+              disabled={isLoading}
               onClick={() => {
-                toggleDeleteModal();
-                toggleSuccessModal();
+                deleteCollection();
               }}
             >
-              Yes
+              {isLoading ? (
+                <span className="text-white flex items-center justify-center">
+                  <ClipLoader size={20} color="#fff" />
+                </span>
+              ) : (
+                "Yes"
+              )}
             </button>
           </div>
         </div>

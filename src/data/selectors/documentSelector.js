@@ -6,3 +6,8 @@ export const selectAllDocuments = createSelector(
   [document],
   (documents) => documents.allDocuments
 );
+
+export const selectDocumentLoading = createSelector(
+  [document],
+  (loading) => loading.isLoading
+);

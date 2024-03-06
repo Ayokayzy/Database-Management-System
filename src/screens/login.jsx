@@ -207,7 +207,7 @@ const Login = () => {
           </div>
         </div>
       </ModalContainer>
-      <ModalContainer show={successModal} width={"max-w-sm p-8"}>
+      <ModalContainer show={successModal} close={toggleSucces} width={"max-w-sm p-8"}>
         <div>
           <img
             src={require("../assets/success-icon.png")}
@@ -215,13 +215,6 @@ const Login = () => {
             className="mx-auto"
           />
           <p className="text-center mt-8">{message}</p>
-          <div className="flex justify-center py-4">
-            <Button
-              handleButton={() => navigate("/login")}
-              text={"Login"}
-              style={"w-full"}
-            />
-          </div>
         </div>
       </ModalContainer>
     </div>
