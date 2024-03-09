@@ -405,12 +405,38 @@ const Collections = () => {
                     <p>Required: {data.required}</p>
                     <p>Unique: {data?.unique}</p>
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 font-light bg-gray-200 text-gray-400 rounded-md">
+                      <button
+                        className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
+                        onClick={() => {
+                          const newColFields = collectionData?.fields?.filter(
+                            (item) => item !== data
+                          );
+                          setCollectionData({
+                            ...collectionData,
+                            fields: newColFields,
+                          });
+                          setFieldsData(data);
+                          setField("add");
+                        }}
+                      >
                         <MdOutlineEdit />
                       </button>
                       <button
                         className="p-2 font-light bg-gray-200 text-gray-400 rounded-md"
-                        onClick={toggleDeleteModal}
+                        onClick={() => {
+                          const newColFields = collectionData?.fields?.filter(
+                            (item) => item !== data
+                          );
+                          setCollectionData({
+                            ...collectionData,
+                            fields: newColFields,
+                          });
+                          setFieldsData(data);
+                          if (!collectionData.fields) {
+                            setFieldsData("");
+                            setField("add")
+                          }
+                        }}
                       >
                         <RiDeleteBin5Line />
                       </button>
@@ -530,8 +556,8 @@ const Collections = () => {
               }}
             >
               {isLoading ? (
-                <span className="text-white flex items-center justify-center">
-                  <ClipLoader size={20} color="#fff" />
+                <span className="text-main flex items-center justify-center">
+                  <ClipLoader size={20} color="" />
                 </span>
               ) : (
                 "Yes"

@@ -160,6 +160,7 @@ const Document = () => {
       const res = await axios.delete(`/document/${editData._id}`);
       dispatch(fetchAllDocuments(dbId, colId));
       setIsLoading(false);
+      dispatch(fetchAllDocuments({ colId, dbId }))
       toggleDeleteModal();
       // toggleSuccessModal();
       toast.success(res.data?.message);
@@ -224,6 +225,7 @@ const Document = () => {
                             href={file.url}
                             className="p-2 px-4 rounded-md border-2 border-blue-900 text-2xl"
                             target="__blank"
+                            download={true}
                           >
                             {file.fileType === "image" ? "View" : "Download"}
                           </a>
