@@ -25,6 +25,7 @@ import {
   selectDocumentLoading,
 } from "../../../../data/selectors/documentSelector";
 import Loader from "../../../../components/loader/loader";
+import JsFileDownloader from "js-file-downloader";
 
 const Document = () => {
   const navigate = useNavigate();
@@ -59,6 +60,15 @@ const Document = () => {
       setFieldsData({ ...fieldsData, [name]: files[0] });
     } else {
       setFieldsData({ ...fieldsData, [name]: value });
+    }
+  };
+
+  const downloadFile = async (url) => {
+    try {
+      await new JsFileDownloader({ url });
+    } catch (err) {
+      toast.error("Download failed");
+      console.log(err);
     }
   };
 
@@ -160,7 +170,7 @@ const Document = () => {
       const res = await axios.delete(`/document/${editData._id}`);
       dispatch(fetchAllDocuments(dbId, colId));
       setIsLoading(false);
-      dispatch(fetchAllDocuments({ colId, dbId }))
+      dispatch(fetchAllDocuments({ colId, dbId }));
       toggleDeleteModal();
       // toggleSuccessModal();
       toast.success(res.data?.message);
@@ -221,14 +231,22 @@ const Document = () => {
                           <p className="text-lg capitalize whitespace-nowrap">
                             {file.name}:
                           </p>
-                          <a
-                            href={file.url}
-                            className="p-2 px-4 rounded-md border-2 border-blue-900 text-2xl"
-                            target="__blank"
-                            download={true}
+                          {file.fileType === "image" && (
+                            <a
+                              href={file.url}
+                              className="p-2 px-4 rounded-md border-2 border-blue-900 text-sm"
+                              target="__blank"
+                              download={true}
+                            >
+                              {"View"}
+                            </a>
+                          )}
+                          <div
+                            className="p-2 px-4 rounded-md border-2 border-blue-900 text-sm"
+                            onClick={() => downloadFile(file.url)}
                           >
-                            {file.fileType === "image" ? "View" : "Download"}
-                          </a>
+                            {"Download"}
+                          </div>
                         </div>
                       ))}
                   </div>
