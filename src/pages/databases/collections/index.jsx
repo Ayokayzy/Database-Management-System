@@ -532,7 +532,7 @@ const Collections = () => {
             className="mx-auto"
           />
           <p className="text-center">
-            Are you sure you want to delete database? Action cannot be undone.
+            Are you sure you want to delete collection? Action cannot be undone.
           </p>
           <div className="flex justify-center gap-8 mt-4">
             <button

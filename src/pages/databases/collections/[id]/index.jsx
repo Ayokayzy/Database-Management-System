@@ -36,6 +36,7 @@ const Document = () => {
   const collectionSchema = useSelector(selectCollectionDetails);
   const documentLoading = useSelector(selectDocumentLoading);
   // console.log({ colId, dbId });
+  const [loading, setLoading] = useState(false);
 
   const [mode, setMode] = useState("create");
   const [fieldsData, setFieldsData] = useState({});
@@ -64,10 +65,13 @@ const Document = () => {
   };
 
   const downloadFile = async (url) => {
+    setLoading(true);
     try {
       await new JsFileDownloader({ url });
+      setLoading(false);
     } catch (err) {
       toast.error("Download failed");
+      setLoading(false);
       console.log(err);
     }
   };
@@ -231,22 +235,23 @@ const Document = () => {
                           <p className="text-lg capitalize whitespace-nowrap">
                             {file.name}:
                           </p>
-                          {file.fileType === "image" && (
+                          {(file.fileType === "image" || file.fileType === "video") && (
                             <a
                               href={file.url}
-                              className="p-2 px-4 rounded-md border-2 border-blue-900 text-sm"
+                              className="p-2 px-4 rounded-md border-2 border-blue-900 text-sm cursor-pointer"
                               target="__blank"
                               download={true}
                             >
                               {"View"}
                             </a>
                           )}
-                          <div
-                            className="p-2 px-4 rounded-md border-2 border-blue-900 text-sm"
+                          <button
+                            className="p-2 px-4 rounded-md border-2 border-blue-900 text-sm cursor-pointer"
+                            disabled={loading}
                             onClick={() => downloadFile(file.url)}
                           >
-                            {"Download"}
-                          </div>
+                            {loading ? "Downloading..." : "Download"}
+                          </button>
                         </div>
                       ))}
                   </div>
@@ -348,7 +353,7 @@ const Document = () => {
             className="mx-auto"
           />
           <p className="text-center">
-            Are you sure you want to delete database? Action cannot be undone.
+            Are you sure you want to delete document? Action cannot be undone.
           </p>
           <div className="flex justify-center gap-8 mt-4">
             <button
